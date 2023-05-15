@@ -14,7 +14,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -27,6 +26,17 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
+
+# Notepad backup
+*.bak
+# msvc 
+*.ncb
+*.suo
+*.user
+*.htm
+.vs/
+Debug/
+Release/
+
