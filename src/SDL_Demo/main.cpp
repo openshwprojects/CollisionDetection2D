@@ -11,6 +11,37 @@
 #define DEG2RAD(deg) ((deg) * M_PI / 180.0)
 #define RAD2DEG(rad) ((rad) * 180.0 / M_PI)
 
+
+#include <cstdio>
+
+void Test_OnAssertionFailed_Float(float real, float expected, float marg, const char* comment, const char* functionName, int lineNumber, const char* fileName)
+{
+    printf("Assertion failed: %s\n", comment);
+    printf("Expected: %f, Actual: %f, Margin: %f\n", expected, real, marg);
+    printf("Location: %s:%d - %s\n", fileName, lineNumber, functionName);
+    system("pause");
+}
+
+void Test_OnAssertionFailed_Truth(const char *expStr, const char* comment, const char* functionName, int lineNumber, const char* fileName)
+{
+    printf("Assertion failed: %s\n", comment);
+    printf("Expected: %s to be true\n", expStr);
+    printf("Location: %s:%d - %s\n", fileName, lineNumber, functionName);
+    system("pause");
+}
+
+
+#define ASSERT_FLOAT_EQUALS(real, expected, marg, comment) \
+	if(fabs((real)-(expected))>marg) { \
+		Test_OnAssertionFailed_Float((real),(expected),(marg), (comment),__FUNCTION__, __LINE__, __FILE__); \
+	} \
+
+
+#define ASSERT_TRUTH(expectedTruth, comment) \
+	if(!expectedTruth) { \
+		Test_OnAssertionFailed_Truth(#expectedTruth, (comment),__FUNCTION__, __LINE__, __FILE__); \
+	} \
+
 class Vec2D {
 	float x, y;
 public:
@@ -173,6 +204,21 @@ class Array : public std::vector<T>
 public:
 };
 
+class Line2D {
+	Vec2D a, b;
+public:
+
+	void set(const Vec2D &pa, const Vec2D &pb) {
+		this->a = pa;
+		this->b = pb;
+	}
+	const Vec2D &getA() const {
+		return a;
+	}
+	const Vec2D &getB() const {
+		return b;
+	}
+};
 enum PlaneSide {
     PS_ON,
     PS_FRONT,
@@ -197,6 +243,13 @@ public:
         float t = -(normal.dot(point) + distance) /(normal.dot(normal));
         return point + normal * t;
     }
+	void getLine(Line2D &out, float halfLen) const {
+		Vec2D perp = normal.getPerpendicular() * halfLen;
+		Vec2D c = normal * -distance;
+		
+		ASSERT_FLOAT_EQUALS(distanceTo(c),0,0.01f,"Plane center point is on plane ");
+		out.set(c-perp, c+perp);
+	}
 	PlaneRelation intersectPlane(const Plane2D& other, Vec2D &res) const {
         float dotProduct = normal.dot(other.normal);
 
@@ -294,36 +347,8 @@ public:
     }
 
 };
-#include <cstdio>
-
-void Test_OnAssertionFailed_Float(float real, float expected, float marg, const char* comment, const char* functionName, int lineNumber, const char* fileName)
-{
-    printf("Assertion failed: %s\n", comment);
-    printf("Expected: %f, Actual: %f, Margin: %f\n", expected, real, marg);
-    printf("Location: %s:%d - %s\n", fileName, lineNumber, functionName);
-    system("pause");
-}
-
-void Test_OnAssertionFailed_Truth(const char *expStr, const char* comment, const char* functionName, int lineNumber, const char* fileName)
-{
-    printf("Assertion failed: %s\n", comment);
-    printf("Expected: %s to be true\n", expStr);
-    printf("Location: %s:%d - %s\n", fileName, lineNumber, functionName);
-    system("pause");
-}
 
 
-
-#define ASSERT_FLOAT_EQUALS(real, expected, marg, comment) \
-	if(fabs((real)-(expected))>marg) { \
-		Test_OnAssertionFailed_Float((real),(expected),(marg), (comment),__FUNCTION__, __LINE__, __FILE__); \
-	} \
-
-
-#define ASSERT_TRUTH(expectedTruth, comment) \
-	if(!expectedTruth) { \
-		Test_OnAssertionFailed_Truth(#expectedTruth, (comment),__FUNCTION__, __LINE__, __FILE__); \
-	} \
 // space defined by set of planes with normals facing outwards
 class PlaneSet2D {
 	Array<Plane2D> planes;
@@ -484,6 +509,15 @@ int main() {
 				Vec2D some_other_point_on_this_plane = point + n.getPerpendicular() * testOfs;
 				ASSERT_FLOAT_EQUALS(pl.distanceTo(some_other_point_on_this_plane), 0, 0.1f, "The plane creation point after shifting by vector perpendicular to plane normal should still be on the plane");
 			}
+
+			// line on plane
+			Line2D line;
+			pl.getLine(line, 100.0f);
+
+			ASSERT_FLOAT_EQUALS(pl.distanceTo(line.getA()),0.0f, 0.1f, "First point of line that is on plane is also on plane");
+			ASSERT_FLOAT_EQUALS(pl.distanceTo(line.getB()),0.0f, 0.1f, "Second point of line that is on plane is also on plane");
+
+
 			pl.swap();
 
 			ASSERT_FLOAT_EQUALS(pl.distanceTo(point),0.0f, 0.1f, "After swapping, point is still on plane");
