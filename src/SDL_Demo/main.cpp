@@ -234,7 +234,6 @@ class Plane2D {
 	Vec2D normal;
 	float distance;
 public:
-	public:
     // Constructors
     Plane2D() : normal(Vec2D()), distance(0.0f) {}
     Plane2D(const Vec2D& newNorm, float distanceVal) : normal(newNorm), distance(distanceVal) {}
@@ -249,6 +248,34 @@ public:
 		
 		ASSERT_FLOAT_EQUALS(distanceTo(c),0,0.01f,"Plane center point is on plane ");
 		out.set(c-perp, c+perp);
+	}
+	
+	bool intersectLine(const Vec2D& segmentStart, const Vec2D& segmentEnd, Vec2D *res) {
+		Vec2D segmentDirection = segmentEnd - segmentStart;
+		Vec2D segmentToPlane = segmentStart - normal * distance;
+
+		float dotProduct = segmentToPlane.getX() * normal.getX() + segmentToPlane.getY() * normal.getY();
+		float directionDotProduct = segmentDirection.getX() * normal.getX() + segmentDirection.getY() * normal.getY();
+
+		// Check if the segment is parallel to the plane
+		if (directionDotProduct == 0.0f) {
+			// The segment is parallel to the plane, no intersection
+			return false;
+		}
+
+		float t = -(dotProduct / directionDotProduct);
+
+		// Check if the intersection point lies within the segment
+		if (t >= 0.0f && t <= 1.0f) {
+			// Intersection point lies within the segment    
+			if(res) {
+				*res = segmentStart + segmentDirection * t;
+			}
+			return true;
+		}
+
+		// No intersection
+		return false;
 	}
 	PlaneRelation intersectPlane(const Plane2D& other, Vec2D &res) const {
         float dotProduct = normal.dot(other.normal);
@@ -307,8 +334,6 @@ public:
 		Vec2D local = nrst - center;
 		
 		local.rotateRadians(angle);
-
-
 
 
 		// rotate normal
@@ -410,9 +435,45 @@ public:
 
 		return false;
 	}
+	int size() const {
+		return planes.size();
+	}
+	const Plane2D &operator[](int idx) const {
+		return planes[idx];
+	}
+	Plane2D &operator[](int idx) {
+		return planes[idx];
+	}
 };
 class Polygon2D {
 	Array<Vec2D> points;
+public:
+
+
+	int size() const {
+		return points.size();
+	}
+	const Vec2D &operator[](int idx) const {
+		return points[idx];
+	}
+	Vec2D &operator[](int idx) {
+		return points[idx];
+	}
+	// setup infinite polygon capped by one plane
+	// normal facing outwards
+	void fromPlane(const Plane2D &pl, float maxWorldSize = 9999.0f) {
+		points.clear();
+		Line2D l;
+		pl.getLine(l,maxWorldSize);
+		points.push_back(l.getA());
+		points.push_back(l.getB());
+		// normal faces outwards, so ground direction is negative normal
+		points.push_back(l.getB() - pl.getNormal() * maxWorldSize);
+		points.push_back(l.getA() - pl.getNormal() * maxWorldSize);
+		
+		ASSERT_FLOAT_EQUALS(pl.distanceTo(points[2]),-maxWorldSize,0.1f,"Far infinite point of poly to plane must be at maxWorldSize dist")
+		ASSERT_FLOAT_EQUALS(pl.distanceTo(points[3]),-maxWorldSize,0.1f,"Far infinite point of poly to plane must be at maxWorldSize dist")
+	}
 };
 class Convex2D {
 public:
@@ -457,6 +518,22 @@ int main() {
 
 	}
 	{
+		// some manual plane vs line intersections, can be easily checked on a piece of paper
+		Plane2D pl = Plane2D::createFromTwoPoints(Vec2D(5,5), Vec2D(-5,-5));
+		
+
+		Vec2D res;
+		
+		// test 1
+		ASSERT_TRUTH(pl.intersectLine(Vec2D(0,2), Vec2D(2,0), &res),"There is intersection");
+		ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(1,1)),0.0f, 0.1f, "Intersection with line test");
+		// test 2
+		ASSERT_TRUTH(pl.intersectLine(Vec2D(0,7), Vec2D(4,3), &res),"There is intersection");
+		ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(3.5f,3.5f)),0.0f, 0.1f, "Intersection with line test");
+		// test 3 (this line ends before plane)
+		ASSERT_TRUTH(false==pl.intersectLine(Vec2D(0,7), Vec2D(3,4), &res),"There is no intersection");
+	}
+	{
 		Plane2D pl = Plane2D::createFromTwoPoints(Vec2D(0,0), Vec2D(1,0));
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(-1,0)),0.0f, 0.1f, "This plane is on X axis");
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(-2,0)),0.0f, 0.1f, "This plane is on X axis");
@@ -464,6 +541,14 @@ int main() {
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(2,0)),0.0f, 0.1f, "This plane is on X axis");
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(0,1)),-1.0f, 0.1f, "And normal is facing down");
 
+		Vec2D res;
+		ASSERT_TRUTH(pl.intersectLine(Vec2D(123,5), Vec2D(123,-5), &res),"There is intersection");
+		ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(123,0)),0.0f, 0.1f, "Intersection with line test");
+		// plane is on X axis, at Y = 0, so it is not reached by this line
+		ASSERT_TRUTH(false==pl.intersectLine(Vec2D(123,5), Vec2D(123,1), &res),"There is no intersection");
+		ASSERT_TRUTH(false==pl.intersectLine(Vec2D(123,-5), Vec2D(123,-1), &res),"There is no intersection");
+		ASSERT_TRUTH(false==pl.intersectLine(Vec2D(-123,5), Vec2D(123,1), &res),"There is no intersection");
+		ASSERT_TRUTH(false==pl.intersectLine(Vec2D(123,-5), Vec2D(-123,-1), &res),"There is no intersection");
 	
 		for(float x = -10; x < 10; x += 3.0f) {
 			Vec2D p(x,1);
@@ -500,7 +585,6 @@ int main() {
 			Vec2D point_twice_as_far = n * dist * 2;
 			Plane2D pl = Plane2D::createFromPointAndNormal(point, n);
 
-
 			ASSERT_FLOAT_EQUALS(pl.distanceTo(point),0.0f, 0.1f, "Plane created from point has this point lying on itself");
 			ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(0,0)),-dist, 0.1f, "For this plane, origin is behind, distance is a negative dist value used");
 			ASSERT_FLOAT_EQUALS(pl.distanceTo(point_twice_as_far),dist, 0.1f, "Point twice as far should be in front of the plane");
@@ -523,12 +607,15 @@ int main() {
 			ASSERT_FLOAT_EQUALS(pl.distanceTo(point),0.0f, 0.1f, "After swapping, point is still on plane");
 			ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(0,0)),dist, 0.1f, "After swapping, distances are negated");
 			ASSERT_FLOAT_EQUALS(pl.distanceTo(point_twice_as_far),-dist, 0.1f, "After swapping, distances are negated");
+
+			Polygon2D poly_inf;
+			poly_inf.fromPlane(pl);
 		}
 
 	}
 	{
 		PlaneSet2D ps1;
-		// x is [0,1], y is [0,1]
+		// x is [0,1], y is [0,1], CCW
 		ps1.fromFourPoints(Vec2D(1,0),  Vec2D(1,1), Vec2D(0,1), Vec2D(0,0));
 		ASSERT_TRUTH(false==ps1.isInside(Vec2D(-1,-1)), "This point should be outside");
 		ASSERT_TRUTH(true==ps1.isInside(Vec2D(0.1,0.1)), "This point should be inside");
@@ -552,7 +639,7 @@ int main() {
 	}
 	{
 		PlaneSet2D ps1;
-		// x is [4,5], y is [0,1]
+		// x is [4,5], y is [0,1], CCW
 		ps1.fromFourPoints(Vec2D(5,0),  Vec2D(5,1), Vec2D(4,1), Vec2D(4,0));
 		ASSERT_TRUTH(false==ps1.isInside(Vec2D(-1,-1)), "This point should be outside");
 		ASSERT_TRUTH(true==ps1.isInside(Vec2D(4.1,0.1)), "This point should be inside");
