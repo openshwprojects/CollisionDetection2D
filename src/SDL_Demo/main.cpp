@@ -14,6 +14,7 @@
 typedef unsigned char byte;
 
 #include <cstdio>
+#include <cstdlib>
 
 void Test_OnAssertionFailed_Float(float real, float expected, float marg, const char* comment, const char* functionName, int lineNumber, const char* fileName)
 {
@@ -43,6 +44,12 @@ void Test_OnAssertionFailed_Truth(const char *expStr, const char* comment, const
 		Test_OnAssertionFailed_Truth(#expectedTruth, (comment),__FUNCTION__, __LINE__, __FILE__); \
 	} \
 
+float RandomFloatRange(float min, float max) {
+    float f = ((float)rand()) / RAND_MAX;
+    f = f * (max - min) + min;
+    return f;
+}
+
 class Vec2D {
 	float x, y;
 public:
@@ -57,6 +64,24 @@ public:
 		float newX = x + (b.x - x) * f;
 		float newY = y + (b.y - y) * f;
 		return Vec2D(newX, newY);
+	}
+	void addX(float f){
+		x+=f;
+	}
+	void addY(float f){ 
+		y+=f;
+	}
+	void setRandom(float max) {
+		x = RandomFloatRange(-max,max);
+		y = RandomFloatRange(-max,max);
+	}
+	void setRandom(float min, float max) {
+		x = RandomFloatRange(min,max);
+		y = RandomFloatRange(min,max);
+	}
+	void setRandom(float minX, float maxX, float minY, float maxY) {
+		x = RandomFloatRange(minX,maxX);
+		y = RandomFloatRange(minY,maxY);
 	}
     void normalize() {
         float len = length();
@@ -200,6 +225,62 @@ public:
         float rad = angleBetween(other);
 		return RAD2DEG(rad);
     }
+};
+
+class BBox2D {
+	Vec2D mins, maxs;
+public:
+
+	BBox2D() { clear(); }
+	void clear() {
+		float inf = 999999.0f;
+		mins.set(inf,inf);
+		maxs.set(-inf,-inf);
+	}
+	bool isInside(const Vec2D &p) const {
+		return p.getX() >= mins.getX() && p.getX() <= maxs.getX() &&
+			   p.getY() >= mins.getY() && p.getY() <= maxs.getY();
+	}
+	void addPoint(const Vec2D &p) {
+		if (p.getX() < mins.getX())
+			mins.setX(p.getX());
+		if (p.getX() > maxs.getX())
+			maxs.setX(p.getX());
+		if (p.getY() < mins.getY())
+			mins.setY(p.getY());
+		if (p.getY() > maxs.getY())
+			maxs.setY(p.getY());
+	}
+	void addPoint(float x, float y) {
+		if (x < mins.getX())
+			mins.setX(x);
+		if (x > maxs.getX())
+			maxs.setX(x);
+		if (y < mins.getY())
+			mins.setY(y);
+		if (y > maxs.getY())
+			maxs.setY(y);
+	}
+	void addBox(const BBox2D &b) {
+		addPoint(b.mins);
+		addPoint(b.maxs);
+	}
+	bool intersectsBox(const BBox2D &b) const {
+		return (maxs.getX() >= b.mins.getX() && mins.getX() <= b.maxs.getX() &&
+				maxs.getY() >= b.mins.getY() && mins.getY() <= b.maxs.getY());
+	}
+	void resetTo(const Vec2D &p) {
+		mins = maxs = p;
+	}
+	Vec2D getSize() const {
+		return Vec2D(maxs.getX() - mins.getX(), maxs.getY() - mins.getY());
+	}
+	float getSizeX() const {
+		return maxs.getX() - mins.getX();
+	}
+	float getSizeY() const {
+		return maxs.getY() - mins.getY();
+	}
 };
 
 #include <vector>
@@ -620,6 +701,31 @@ int main() {
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(2,0)),0.0f, 0.1f, "This plane is on X axis");
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(Vec2D(0,1)),-1.0f, 0.1f, "And normal is facing down");
 
+	}
+	{
+		BBox2D box;
+		float max = 10000.0f;
+		for(int i = 0; i < 100; i++) {
+			Vec2D t;
+			t.setRandom(max);
+			ASSERT_TRUTH(box.isInside(t)==false,"empty BBOX does not contain any point");
+		}
+		// make bbox [5,5] to [7, 9]
+		box.addPoint(5,9);
+		box.addPoint(7,5);
+		for(int i = 0; i < 100; i++) {
+			Vec2D t;
+			t.setRandom(5,7, 5,9);
+			ASSERT_TRUTH(box.isInside(t)==true,"this point should be inside");
+		}
+		for(int i = 0; i < 100; i++) {
+			Vec2D t;
+			t.setRandom(0, 1000);
+			t.addX(7);
+			t.addY(9);
+			ASSERT_TRUTH(box.isInside(t)==false,"this point should be outside");
+		}
+	
 	}
 	{
 		// some manual plane vs line intersections, can be easily checked on a piece of paper
