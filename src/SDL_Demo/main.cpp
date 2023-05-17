@@ -11,6 +11,7 @@
 #define DEG2RAD(deg) ((deg) * M_PI / 180.0)
 #define RAD2DEG(rad) ((rad) * 180.0 / M_PI)
 
+typedef unsigned char byte;
 
 #include <cstdio>
 
@@ -52,6 +53,11 @@ public:
         return sqrt(x * x + y * y);
     }
 
+	Vec2D lerpTo(const Vec2D &b, float f) const {
+		float newX = x + (b.x - x) * f;
+		float newY = y + (b.y - y) * f;
+		return Vec2D(newX, newY);
+	}
     void normalize() {
         float len = length();
         if (len != 0.0f) {
@@ -230,6 +236,16 @@ enum PlaneRelation {
     PR_Coincident,
     PR_Intersecting
 };
+enum PlaneLineRelation {
+	// line intersects plane
+	PLR_Intersects,
+	// line is on plane
+	PRL_On,
+	// line is in front off plane
+	PLR_Front,
+	// line is in behind plane
+	PLR_Behind,
+};
 class Plane2D {
 	Vec2D normal;
 	float distance;
@@ -250,7 +266,27 @@ public:
 		out.set(c-perp, c+perp);
 	}
 	
-	bool intersectLine(const Vec2D& segmentStart, const Vec2D& segmentEnd, Vec2D *res) {
+	PlaneLineRelation intersectLineExt(const Vec2D& segmentStart, const Vec2D& segmentEnd, Vec2D *res) const {
+		float distanceStart = this->distanceTo(segmentStart);
+		float distanceEnd = this->distanceTo(segmentEnd);
+		// on front of the plane
+		if(distanceStart > 0 && distanceEnd > 0)
+			return PLR_Front;
+		// behind the plane
+		if(distanceStart < 0 && distanceEnd < 0)
+			return PLR_Behind;
+		float eps = 0.001f;
+		// on plane
+		if(fabs(distanceStart) < eps && fabs(distanceEnd)) {
+			return PRL_On;
+		}
+		// intersection
+		float t = distanceStart / (distanceStart - distanceEnd);
+		*res = segmentStart + (segmentEnd - segmentStart) * t;
+
+		return PLR_Intersects;
+	}
+	bool intersectLine(const Vec2D& segmentStart, const Vec2D& segmentEnd, Vec2D *res) const {
 		Vec2D segmentDirection = segmentEnd - segmentStart;
 		Vec2D segmentToPlane = segmentStart - normal * distance;
 
@@ -270,6 +306,12 @@ public:
 			// Intersection point lies within the segment    
 			if(res) {
 				*res = segmentStart + segmentDirection * t;
+				// also check second method
+#if 1
+				Vec2D verify;
+				ASSERT_TRUTH(PLR_Intersects==this->intersectLineExt(segmentStart, segmentEnd, &verify),"Both plane vs line gives the same result");
+				ASSERT_FLOAT_EQUALS(res->distanceTo(verify),0.0f, 0.1f, "Both plane vs line gives the same result");
+#endif
 			}
 			return true;
 		}
@@ -343,9 +385,11 @@ public:
 		fromPointAndNormal(local+center,normal);
     }
     // Get relation of a point to the plane with a distance epsilon
-    PlaneSide getPointPlaneRelation(const Vec2D& pointVal, float epsilon = 0.001f) const {
+    PlaneSide getPointPlaneRelation(const Vec2D& pointVal, float *outDist = 0, float epsilon = 0.001f) const {
         float dist = distanceTo(pointVal);
-        if (dist < epsilon) {
+		if(outDist)
+			*outDist = dist;
+        if (dist < epsilon && dist > -epsilon) {
             return PS_ON;
         } else if (dist > epsilon) {
             return PS_FRONT;
@@ -474,6 +518,66 @@ public:
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(points[2]),-maxWorldSize,0.1f,"Far infinite point of poly to plane must be at maxWorldSize dist")
 		ASSERT_FLOAT_EQUALS(pl.distanceTo(points[3]),-maxWorldSize,0.1f,"Far infinite point of poly to plane must be at maxWorldSize dist")
 	}
+	// removes everything in front of plane
+	void clipByPlane(const Plane2D &pl) {
+	/*	for(int i = 0; i < points.size(); i++) {
+			int j = (i+1)%points.size();
+			Vec2D a = points[i];
+			Vec2D b = points[j];
+			Vec2D c;
+			PlaneLineRelation rel = pl.intersectLineExt(a,b,&c);
+			if(rel == PLR_Front){
+			} else if(rel == PLR_Intersects) {
+
+			}
+		}*/
+		byte cnts[4] = { 0,0,0,0 };
+		float *dists = (float*) alloca(points.size()*sizeof(float));
+		byte *rels = (byte*) alloca(points.size()*sizeof(byte));
+		for(int i = 0; i < points.size(); i++){
+			rels[i] = pl.getPointPlaneRelation(points[i],&dists[i]);
+			cnts[rels[i]]++;
+		}
+		if(cnts[PS_BACK] == 0) {
+			// nothing to remove
+			return;
+		}
+		if(cnts[PS_FRONT] == 0) {
+			// all to remove
+			points.clear();
+			return;
+		}
+		Array<Vec2D> nA;
+		for(int i = 0; i < points.size(); i++){
+			const Vec2D &p = points[i];
+			if(rels[i] == PS_ON) {
+				nA.push_back(p);
+				continue;
+			}
+			if(rels[i] == PS_BACK) {
+				nA.push_back(p);
+			}
+			int ni = (i+1)%points.size();
+			if(rels[ni] == PS_ON || rels[ni] == rels[i]) {
+				continue;
+			}
+			const Vec2D &p2 = points[ni];
+			float d = dists[i] / (dists[i]-dists[ni]);
+			nA.push_back(p.lerpTo(p2,d));
+			//Vec2D tmp;
+			//pl.intersectLine(p,p2,&tmp);
+			//nA.push_back(tmp);
+		}
+		points = nA;
+	}
+	void fromPlanes(const PlaneSet2D &planes) {
+		// TODO: first calculate bounding box for all simple plane vs plane intersections 
+		// and then use it for max coord
+		fromPlane(planes[0]);
+		for(int i = 1; i < planes.size(); i++) {
+			clipByPlane(planes[i]);
+		}
+	}
 };
 class Convex2D {
 public:
@@ -521,17 +625,32 @@ int main() {
 		// some manual plane vs line intersections, can be easily checked on a piece of paper
 		Plane2D pl = Plane2D::createFromTwoPoints(Vec2D(5,5), Vec2D(-5,-5));
 		
-
-		Vec2D res;
+		{
+			Vec2D res;
+			
+			// test 1
+			ASSERT_TRUTH(pl.intersectLine(Vec2D(0,2), Vec2D(2,0), &res),"There is intersection");
+			ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(1,1)),0.0f, 0.1f, "Intersection with line test");
+			// test 2
+			ASSERT_TRUTH(pl.intersectLine(Vec2D(0,7), Vec2D(4,3), &res),"There is intersection");
+			ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(3.5f,3.5f)),0.0f, 0.1f, "Intersection with line test");
+			// test 3 (this line ends before plane)
+			ASSERT_TRUTH(false==pl.intersectLine(Vec2D(0,7), Vec2D(3,4), &res),"There is no intersection");
+		}
+		{	
+			Vec2D res;
+			
+			// test 1
+			ASSERT_TRUTH(PLR_Intersects==pl.intersectLineExt(Vec2D(0,2), Vec2D(2,0), &res),"There is intersection");
+			ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(1,1)),0.0f, 0.1f, "Intersection with line test");
+			// test 2
+			ASSERT_TRUTH(PLR_Intersects==pl.intersectLineExt(Vec2D(0,7), Vec2D(4,3), &res),"There is intersection");
+			ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(3.5f,3.5f)),0.0f, 0.1f, "Intersection with line test");
+			// test 3 (this line ends before plane)
+			ASSERT_TRUTH(PLR_Front==pl.intersectLineExt(Vec2D(0,7), Vec2D(3,4), &res),"There is no intersection");
+		}
 		
-		// test 1
-		ASSERT_TRUTH(pl.intersectLine(Vec2D(0,2), Vec2D(2,0), &res),"There is intersection");
-		ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(1,1)),0.0f, 0.1f, "Intersection with line test");
-		// test 2
-		ASSERT_TRUTH(pl.intersectLine(Vec2D(0,7), Vec2D(4,3), &res),"There is intersection");
-		ASSERT_FLOAT_EQUALS(res.distanceTo(Vec2D(3.5f,3.5f)),0.0f, 0.1f, "Intersection with line test");
-		// test 3 (this line ends before plane)
-		ASSERT_TRUTH(false==pl.intersectLine(Vec2D(0,7), Vec2D(3,4), &res),"There is no intersection");
+
 	}
 	{
 		Plane2D pl = Plane2D::createFromTwoPoints(Vec2D(0,0), Vec2D(1,0));
@@ -622,6 +741,9 @@ int main() {
 		ASSERT_TRUTH(true==ps1.isInside(Vec2D(0.7,0.7)), "This point should be inside");
 		ASSERT_TRUTH(false==ps1.isInside(Vec2D(1.2,0.5)), "This point should be outside");
 		ASSERT_TRUTH(false==ps1.isInside(Vec2D(0.5,1.5)), "This point should be outside");
+		Polygon2D poly_first;
+		poly_first.fromPlanes(ps1);
+
 		// if we rotate it around origin by 180, it should be within x [-1,0] and y [-1,0]
 		ps1.rotateAroundRadians(Vec2D(0,0),DEG2RAD(180));
 		ASSERT_TRUTH(true==ps1.isInside(Vec2D(-0.2f,-0.2f)), "This point should be inside");
