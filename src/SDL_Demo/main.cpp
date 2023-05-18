@@ -99,6 +99,16 @@ public:
         return y;
     }
 
+	Vec2D getAbsolute() const {
+		return Vec2D(fabs(x),fabs(y));
+	}
+	float getAbsoluteSingle() const {
+		float a = fabs(x);
+		float b = fabs(y);
+		if(a>b)
+			return a;
+		return b;
+	}
     void set(float xVal, float yVal) {
         x = xVal;
         y = yVal;
@@ -280,6 +290,13 @@ public:
 	}
 	float getSizeY() const {
 		return maxs.getY() - mins.getY();
+	}
+	float getMaxExtentFromCenter() const {
+		float a = maxs.getAbsoluteSingle();
+		float b = mins.getAbsoluteSingle();
+		if(a>b)
+			return a;
+		return b;
 	}
 };
 
@@ -619,11 +636,11 @@ public:
 			rels[i] = pl.getPointPlaneRelation(points[i],&dists[i]);
 			cnts[rels[i]]++;
 		}
-		if(cnts[PS_BACK] == 0) {
+		if(cnts[PS_FRONT] == 0) {
 			// nothing to remove
 			return;
 		}
-		if(cnts[PS_FRONT] == 0) {
+		if(cnts[PS_BACK] == 0) {
 			// all to remove
 			points.clear();
 			return;
@@ -652,9 +669,19 @@ public:
 		points = nA;
 	}
 	void fromPlanes(const PlaneSet2D &planes) {
+		BBox2D bb;
+		for(int i = 0; i < planes.size(); i++){
+			int j = (i+1)%planes.size();
+			Vec2D p;
+			PlaneRelation pr = planes[i].intersectPlane(planes[j],p);
+			if(pr == PR_Intersecting) {
+				bb.addPoint(p);
+			}
+		}
+		float maxCoord = bb.getMaxExtentFromCenter();
 		// TODO: first calculate bounding box for all simple plane vs plane intersections 
 		// and then use it for max coord
-		fromPlane(planes[0]);
+		fromPlane(planes[0],maxCoord);
 		for(int i = 1; i < planes.size(); i++) {
 			clipByPlane(planes[i]);
 		}
@@ -905,7 +932,13 @@ int main() {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = 0;
-            }
+			} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					int mouseX = event.button.x;
+					int mouseY = event.button.y;
+
+				}
+			}
         }
 
 		// Set the background color to green
