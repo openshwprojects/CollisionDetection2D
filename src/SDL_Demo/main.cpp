@@ -59,6 +59,9 @@ public:
     float length() const {
         return sqrt(x * x + y * y);
     }
+    float lengthSq() const {
+        return (x * x + y * y);
+    }
 
 	Vec2D lerpTo(const Vec2D &b, float f) const {
 		float newX = x + (b.x - x) * f;
@@ -70,6 +73,9 @@ public:
 	}
 	void addY(float f){ 
 		y+=f;
+	}
+	bool isWithin(const Vec2D &p, float marg) const {
+		return distanceToSq(p) < marg*marg;
 	}
 	void setRandom(float max) {
 		x = RandomFloatRange(-max,max);
@@ -124,6 +130,10 @@ public:
     float distanceTo(const Vec2D& p) const {
 		Vec2D tmp = *this - p;
 		return tmp.length();
+    }
+    float distanceToSq(const Vec2D& p) const {
+		Vec2D tmp = *this - p;
+		return tmp.lengthSq();
     }
 
     // Method to get the perpendicular vector
@@ -601,6 +611,13 @@ public:
 	Vec2D &operator[](int idx) {
 		return points[idx];
 	}
+	bool hasVertex(const Vec2D &v, float margin) const {
+		for(int i = 0; i < points.size(); i++){
+			if(points[i].isWithin(v,margin))
+				return true;
+		}
+		return false;
+	}
 	// setup infinite polygon capped by one plane
 	// normal facing outwards
 	void fromPlane(const Plane2D &pl, float maxWorldSize = 9999.0f) {
@@ -866,8 +883,70 @@ int main() {
 
 	}
 	{
+		// this is a rectangle rotated by 45 degrees
+		// smth like
+		//        |
+		//        |
+		//        | /\
+		//        | \/
+		// ------- -----------------
+		//        |
+		//        |
+		//        |
+		PlaneSet2D ps1;
+		ps1.fromFourPoints(Vec2D(5,3),  Vec2D(3,5), Vec2D(1,3), Vec2D(3,1));
+		ASSERT_TRUTH(false==ps1.isInside(Vec2D(1, 3.25f)), "This point should be outside");
+		ASSERT_TRUTH(false==ps1.isInside(Vec2D(1, 2.75f)), "This point should be outside");
+		ASSERT_TRUTH(false==ps1.isInside(Vec2D(2, 1)), "This point should be outside");
+		ASSERT_TRUTH(false==ps1.isInside(Vec2D(2, 1.75f)), "This point should be outside");
+		ASSERT_TRUTH(false==ps1.isInside(Vec2D(4, 1.75f)), "This point should be outside");
+		ASSERT_TRUTH(false==ps1.isInside(Vec2D(5, 2.75f)), "This point should be outside");
+		for(float f = 0.1f; f < 6.0f; f+= 0.123f) {
+			ASSERT_TRUTH(false==ps1.isInside(Vec2D(6, f)), "This point should be outside");
+			ASSERT_TRUTH(false==ps1.isInside(Vec2D(0.75f, f)), "This point should be outside");
+		}
+		for(float f = 1.25f; f < 4.75f; f+= 0.123f) {
+			ASSERT_TRUTH(true==ps1.isInside(Vec2D(f, 3.0f)), "This point should be inside");
+		}
+		for(float f = 2.1f; f < 3.9f; f+= 0.123f) {
+			ASSERT_TRUTH(true==ps1.isInside(Vec2D(f, f)), "This point should be inside");
+		};
+		{
+			Polygon2D poly_first;
+			poly_first.fromPlanes(ps1);
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(5,3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,5),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(1,3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,1),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(poly_first.size()==4, "Poly should have 4 vertices");
+		}
+		
+		// if we rotate it around origin by 180, it should be like before but with negative coords
+		ps1.rotateAroundRadians(Vec2D(0,0),DEG2RAD(180));
+
+		{
+			Polygon2D poly_first;
+			poly_first.fromPlanes(ps1);
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(-5,-3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(-3,-5),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(-1,-3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(-3,-1),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(poly_first.size()==4, "Poly should have 4 vertices");
+		}
+	}
+	{
 		PlaneSet2D ps1;
 		// x is [0,1], y is [0,1], CCW
+		//
+		//
+		//        |
+		//        |
+		//        | --
+		//        |   |
+		// ------- -----------------
+		//        |
+		//        |
+		//        |
 		ps1.fromFourPoints(Vec2D(1,0),  Vec2D(1,1), Vec2D(0,1), Vec2D(0,0));
 		ASSERT_TRUTH(false==ps1.isInside(Vec2D(-1,-1)), "This point should be outside");
 		ASSERT_TRUTH(true==ps1.isInside(Vec2D(0.1,0.1)), "This point should be inside");
@@ -876,6 +955,11 @@ int main() {
 		ASSERT_TRUTH(false==ps1.isInside(Vec2D(0.5,1.5)), "This point should be outside");
 		Polygon2D poly_first;
 		poly_first.fromPlanes(ps1);
+		ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(1,0),0.001f), "Poly should have this vertex");
+		ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(0,0),0.001f), "Poly should have this vertex");
+		ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(0,1),0.001f), "Poly should have this vertex");
+		ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(0,0),0.001f), "Poly should have this vertex");
+		ASSERT_TRUTH(poly_first.size()==4, "Poly should have 4 vertices");
 
 		// if we rotate it around origin by 180, it should be within x [-1,0] and y [-1,0]
 		ps1.rotateAroundRadians(Vec2D(0,0),DEG2RAD(180));
