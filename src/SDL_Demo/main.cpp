@@ -933,6 +933,37 @@ int main() {
 			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(-3,-1),0.001f), "Poly should have this vertex");
 			ASSERT_TRUTH(poly_first.size()==4, "Poly should have 4 vertices");
 		}
+		// if we rotate it again by 90, we expect:
+		//
+		//        |  
+		//        |
+		//        |
+		// ------- -----------------
+		//        |/\
+		//        |\/
+		//        |
+		ps1.rotateAroundRadians(Vec2D(0,0),DEG2RAD(90));
+		{
+			Polygon2D poly_first;
+			poly_first.fromPlanes(ps1);
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(5,-3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-5),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(1,-3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-1),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(poly_first.size()==4, "Poly should have 4 vertices");
+
+
+			Plane2D cut;
+			cut.fromTwoPoints(Vec2D(3,-5),Vec2D(3,-1));
+			poly_first.clipByPlane(cut);
+			ASSERT_TRUTH(poly_first.size()==3, "Poly should have 3 vertices");
+			ASSERT_TRUTH(false==poly_first.hasVertex(Vec2D(5,-3),0.001f), "Poly should NOT have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-5),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(1,-3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-1),0.001f), "Poly should have this vertex");
+
+
+		}
 	}
 	{
 		PlaneSet2D ps1;
