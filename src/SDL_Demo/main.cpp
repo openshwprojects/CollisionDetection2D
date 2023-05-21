@@ -956,12 +956,37 @@ int main() {
 			Plane2D cut;
 			cut.fromTwoPoints(Vec2D(3,-5),Vec2D(3,-1));
 			poly_first.clipByPlane(cut);
+			// it is now
+			//        |  
+			//        |
+			//        |
+			// ------- -----------------
+			//        |/|
+			//        |\|
+			//        |
 			ASSERT_TRUTH(poly_first.size()==3, "Poly should have 3 vertices");
 			ASSERT_TRUTH(false==poly_first.hasVertex(Vec2D(5,-3),0.001f), "Poly should NOT have this vertex");
 			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-5),0.001f), "Poly should have this vertex");
 			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(1,-3),0.001f), "Poly should have this vertex");
 			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-1),0.001f), "Poly should have this vertex");
 
+
+
+			cut.fromTwoPoints(Vec2D(-20,-3),Vec2D(20,-3));
+			poly_first.clipByPlane(cut);
+			// it is now
+			//        |  
+			//        |
+			//        |
+			// ------- -----------------
+			//        |/|
+			//        |--
+			//        |
+			ASSERT_TRUTH(false==poly_first.hasVertex(Vec2D(5,-3),0.001f), "Poly should NOT have this vertex");
+			ASSERT_TRUTH(false==poly_first.hasVertex(Vec2D(3,-5),0.001f), "Poly should NOT have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(1,-3),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-1),0.001f), "Poly should have this vertex");
+			ASSERT_TRUTH(true==poly_first.hasVertex(Vec2D(3,-3),0.001f), "Poly should have this vertex");
 
 		}
 	}
