@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;;.\"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -113,7 +113,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;;.\"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -170,6 +170,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Common.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -179,6 +183,30 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\Assertion.h"
+				>
+			</File>
+			<File
+				RelativePath=".\BBox2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Line2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Plane2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Vec2.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
