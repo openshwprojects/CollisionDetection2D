@@ -349,80 +349,182 @@ void doBasicSelfTests() {
 	}
 
 }
-int main() {
+class IBaseDemo {
+protected:
+	class IDemoRenderer *r;
+public:
+	virtual void onMouseEvent(int x, int y, int button, bool bDown) = 0;
+	virtual void onKeyEvent(int key, bool bDown) = 0;
+	virtual bool onQuit() = 0;
+	virtual void runFrame() = 0;
 
-	doBasicSelfTests();
+	void setRenderer(IDemoRenderer *ren) {
+		this->r = ren;
+	}
+};
+class IDemoRenderer { 
+public:
+	virtual void setColor(byte r, byte g, byte b, byte a = 255) = 0;
+	virtual void drawLine(float x, float y, float x2, float y2) = 0;
+	virtual void drawLine(float x, float y, float x2, float y2, int width) = 0;
+	virtual void beginFrame(byte r, byte g, byte b, byte a = 255) = 0;
+	virtual void endFrame() = 0;
+};
+class CDemoClipByPlane : public IBaseDemo {
+	Polygon2D poly;
+	PlaneSet2D planes;
+	
+public:
+	CDemoClipByPlane() {
 
-    // Initialize SDL
-    SDL_Init(SDL_INIT_VIDEO);
 
-    // Create a window
-    SDL_Window* window = SDL_CreateWindow("SDL Rectangle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
+	}
+	virtual void onMouseEvent(int x, int y, int button, bool bDown) {
 
-    // Create a renderer
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	}
+	virtual void onKeyEvent(int key, bool bDown)  {
+	}
+	virtual bool onQuit() {
+		return true;
+	}
+	virtual void runFrame() {
+		r->beginFrame(255,255,0);
+		r->setColor(255,0,0);
+		r->drawLine(50,50,200,200,1);
+		r->endFrame();
+	}
+};
+class CDemoContainer : public IBaseDemo {
+	Array<IBaseDemo*> demos;
+	int current;
 
-    // Set the background color to green
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+	void addDemo(IBaseDemo *d) {
+		demos.push_back(d);
+		d->setRenderer(r);
+	}
+public:
+	CDemoContainer(){ 
+		current = 0;
+		addDemo(new CDemoClipByPlane);
+	}
+	virtual void setRenderer(IDemoRenderer *ren) {
+		for(int i = 0; i < demos.size(); i++){
+			demos[i]->setRenderer(ren);
+		}
+		IBaseDemo::setRenderer(ren);
+	}
+	virtual void onMouseEvent(int x, int y, int button, bool bDown) {
+		demos[current]->onMouseEvent(x,y,button,bDown);
+	}
+	virtual void onKeyEvent(int key, bool bDown)  {
+		demos[current]->onKeyEvent(key,bDown);
+	}
+	virtual bool onQuit() {
+		return demos[current]->onQuit();
+	}
+	virtual void runFrame() {
+		demos[current]->runFrame();
+	}
+};
+class SDLDemoRenderer : public IDemoRenderer {
+	SDL_Renderer* renderer;
+    SDL_Window* window;
+	class IBaseDemo *demo ;
+	int running;
+public:
+	SDLDemoRenderer() {
 
-    // Initialize rectangle properties
-    SDL_Rect rect;
-    rect.x = 100;
-    rect.y = 100;
-    rect.w = 200;
-    rect.h = 150;
+	}
+	void setDemo(IBaseDemo *demo) {
+		this->demo = demo;
+	}
+	void createWindow() {
+		// Initialize SDL
+		SDL_Init(SDL_INIT_VIDEO);
 
-    int delta = 1;  // Amount to enlarge the rectangle by each frame
+		// Create a window
+		window = SDL_CreateWindow("SDL Rectangle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
 
-    // Game loop
-    int running = 1;
-    while (running) {
+		// Create a renderer
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+		///SDL_RenderSetScale(renderer,3,3);
+	}
+	virtual void setColor(byte r, byte g, byte b, byte a = 255) {
+        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	}
+	virtual void drawLine(float x, float y, float x2, float y2, int width) {
+		Vec2D a(x,y);
+		Vec2D b(x2,y2);
+		Vec2D v = (a-b);
+		v.normalize();
+		v = v.getPerpendicular();
+		for(float i = -width; i < width; i+=1.0f) {
+			Vec2D a2 = a + v * i;
+			Vec2D b2 = b + v * i;
+			drawLine(a2.getX(),a2.getY(),b2.getX(),b2.getY());
+		}
+	}
+	virtual void drawLine(float x, float y, float x2, float y2) {
+		SDL_RenderDrawLineF(renderer, x, y, x2, y2);
+	}
+	virtual bool processEvents() {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                running = 0;
-			} else if (event.type == SDL_MOUSEBUTTONDOWN) {
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					int mouseX = event.button.x;
-					int mouseY = event.button.y;
-
+				if(demo->onQuit()) {
+					running = 0;
+					return true;
 				}
+			} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+				demo->onMouseEvent(event.button.x,event.button.y,event.button.button, true);
+			} else if (event.type == SDL_MOUSEBUTTONUP) {
+				demo->onMouseEvent(event.button.x,event.button.y,event.button.button, false);
+			} else if(event.type == SDL_KEYDOWN) {
+				demo->onKeyEvent(event.key.keysym.sym, true);
+			} else if(event.type == SDL_KEYUP) {
+				demo->onKeyEvent(event.key.keysym.sym, false);
 			}
         }
-
+		return false;
+	}
+	virtual void shutdown() {
+		// Cleanup and quit SDL
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+	}
+	virtual void beginFrame(byte r, byte g, byte b, byte a) {
 		// Set the background color to green
-		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+		SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
         // Clear the renderer with the background color
         SDL_RenderClear(renderer);
 
-        // Set the rectangle color to red
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-        // Enlarge the rectangle
-        rect.x -= delta;
-        rect.y -= delta;
-        rect.w += 2 * delta;
-        rect.h += 2 * delta;
-
-        // Render the rectangle
-        //SDL_RenderFillRect(renderer, &rect);
-        // Draw the rectangle using four lines
-        SDL_RenderDrawLine(renderer, rect.x, rect.y, rect.x + rect.w, rect.y);
-        SDL_RenderDrawLine(renderer, rect.x, rect.y, rect.x, rect.y + rect.h);
-        SDL_RenderDrawLine(renderer, rect.x + rect.w, rect.y, rect.x + rect.w, rect.y + rect.h);
-        SDL_RenderDrawLine(renderer, rect.x, rect.y + rect.h, rect.x + rect.w, rect.y + rect.h);
-
-
+	}
+	virtual void endFrame() {
         // Update the window
         SDL_RenderPresent(renderer);
 
         SDL_Delay(10);  // Add a small delay to control the frame rate
-    }
+	}
+};
 
-    // Cleanup and quit SDL
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+
+
+int main() {
+
+	doBasicSelfTests();
+
+
+	CDemoContainer *demo = new CDemoContainer();
+	SDLDemoRenderer *ren = new SDLDemoRenderer();
+	demo->setRenderer(ren);
+	ren->createWindow();
+	ren->setDemo(demo);
+	while(!ren->processEvents()) {
+		demo->runFrame();
+	}
+	ren->shutdown();
+
 	return 0;
 }
