@@ -170,11 +170,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Assertion.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Common.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Polygon2D.cpp"
 				>
 			</File>
 		</Filter>
@@ -201,6 +209,14 @@
 			</File>
 			<File
 				RelativePath=".\Plane2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PlaneSet2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Polygon2D.h"
 				>
 			</File>
 			<File

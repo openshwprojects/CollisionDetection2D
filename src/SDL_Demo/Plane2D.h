@@ -2,6 +2,7 @@
 #define __PLANE2D_H__
 
 #include <Line2D.h>
+#include <Assertion.h>
 
 enum PlaneSide {
     PS_ON,
