@@ -25,6 +25,15 @@ public:
 		}
 		return false;
 	}
+	void addVertex(const Vec2D &b) { 
+		points.push_back(b);
+	}
+	void addVertex(float x, float y) {
+		addVertex(Vec2D(x,y));
+	}
+	const Array<Vec2D> &getPoints() const {
+		return points;
+	}
 	// setup infinite polygon capped by one plane
 	// normal facing outwards
 	void fromPlane(const class Plane2D &pl, float maxWorldSize = 9999.0f);

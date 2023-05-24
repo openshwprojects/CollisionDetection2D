@@ -23,6 +23,21 @@ template<typename T>
 class Array : public std::vector<T>
 {
 public:
+
+	const T *getArray() const {
+		if(size()==0)
+			return NULL;
+		return &(*this)[0];
+	}
+	T *getArray() {
+		if(size()==0)
+			return NULL;
+		return &(*this)[0];
+	}
+	int elementSize() const {
+		return sizeof(T);
+	}
+
 };
 
 #endif

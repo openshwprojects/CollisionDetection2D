@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;;.\"
+				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;;.\;&quot;..\Libraries\SDL2_ttf-2.20.2\include&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -59,7 +59,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="..\..\bin\$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;..\Libraries\SDL2-2.26.5\lib\x86&quot;"
+				AdditionalLibraryDirectories="&quot;..\Libraries\SDL2-2.26.5\lib\x86&quot;;&quot;..\Libraries\SDL2_ttf-2.20.2\lib\x86&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="0"
 				TargetMachine="1"
@@ -113,7 +113,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;;.\"
+				AdditionalIncludeDirectories="&quot;..\Libraries\SDL2-2.26.5\include&quot;;.\;&quot;..\Libraries\SDL2_ttf-2.20.2\include&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -131,7 +131,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="..\..\bin\$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;..\Libraries\SDL2-2.26.5\lib\x86&quot;"
+				AdditionalLibraryDirectories="&quot;..\Libraries\SDL2-2.26.5\lib\x86&quot;;&quot;..\Libraries\SDL2_ttf-2.20.2\lib\x86&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="0"
 				OptimizeReferences="2"
@@ -179,6 +179,10 @@
 			</File>
 			<File
 				RelativePath=".\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PlaneSet2D.cpp"
 				>
 			</File>
 			<File

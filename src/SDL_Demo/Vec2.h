@@ -179,6 +179,12 @@ public:
         // Create and return a new Vec2D object with the calculated components
         return Vec2D(xComponent, yComponent);
     }
+	float getAngleRad() const {
+		return atan2(y,x);
+	}
+	float getAngleDeg() const {
+		return RAD2DEG(getAngleRad());
+	}
     // Returns the angle between two normal vectors in radians
     float angleBetween(const Vec2D& other) const {
         float dotProduct = dot(other);

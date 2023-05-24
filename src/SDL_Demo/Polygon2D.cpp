@@ -71,6 +71,10 @@ void Polygon2D::clipByPlane(const Plane2D &pl) {
 	points = nA;
 }
 void Polygon2D::fromPlanes(const PlaneSet2D &planes) {
+	points.clear();
+	if(planes.size() < 3) {
+		return;
+	}
 	BBox2D bb;
 	for(int i = 0; i < planes.size(); i++){
 		int j = (i+1)%planes.size();
@@ -83,7 +87,7 @@ void Polygon2D::fromPlanes(const PlaneSet2D &planes) {
 	float maxCoord = bb.getMaxExtentFromCenter();
 	// TODO: first calculate bounding box for all simple plane vs plane intersections 
 	// and then use it for max coord
-	fromPlane(planes[0],maxCoord);
+	fromPlane(planes[0],maxCoord*2);
 	for(int i = 1; i < planes.size(); i++) {
 		clipByPlane(planes[i]);
 	}

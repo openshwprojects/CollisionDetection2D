@@ -1,9 +1,11 @@
 #define SDL_MAIN_HANDLED
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #pragma comment(lib, "SDL2.lib")
 #pragma comment(lib, "SDL2main.lib")
+#pragma comment(lib, "SDL2_ttf.lib")
 
 #include <Common.h>
 #include <Vec2.h>
@@ -365,22 +367,75 @@ public:
 class IDemoRenderer { 
 public:
 	virtual void setColor(byte r, byte g, byte b, byte a = 255) = 0;
-	virtual void drawLine(float x, float y, float x2, float y2) = 0;
-	virtual void drawLine(float x, float y, float x2, float y2, int width) = 0;
+	virtual void drawLine(const Vec2D &a, const Vec2D &b) = 0;
+	virtual void drawLine(const Vec2D &a, const Vec2D &b, int width) = 0;
 	virtual void beginFrame(byte r, byte g, byte b, byte a = 255) = 0;
+	virtual int drawText(int x, int y, const char *s, byte r, byte g, byte b) = 0;
 	virtual void endFrame() = 0;
 };
-class CDemoClipByPlane : public IBaseDemo {
-	Polygon2D poly;
-	PlaneSet2D planes;
-	
+class CBaseDemo : public IBaseDemo {
+	int textH;
 public:
-	CDemoClipByPlane() {
-
+	void resetDebugText() {
+		textH = 30;
+	}
+	void drawDebugText(const char *s) {
+		textH = r->drawText(20,textH,s,255,250,250);
+	}
+	void drawPoly(const Polygon2D &p, byte r, byte g, byte b, byte a = 255) {
+		this->r->setColor(r,g,b);
+		for(int i = 0; i < p.size(); i++) {
+			int n = (i+1)%p.size();
+			this->r->drawLine(p[i],p[n]);
+		}
+	}
+};
+class CDemoSortVertices : public CBaseDemo {
+	Polygon2D poly;
+	Polygon2D poly2;
+	PlaneSet2D planes;
+public:
+	CDemoSortVertices() {
 
 	}
 	virtual void onMouseEvent(int x, int y, int button, bool bDown) {
+		if(bDown){
+			poly.addVertex(x,y);
+		}
+	}
+	virtual void onKeyEvent(int key, bool bDown)  {
+	}
+	virtual bool onQuit() {
+		return true;
+	}
+	virtual void runFrame() {
+		r->beginFrame(150,150,255);
+		resetDebugText();
+		drawDebugText("Test");
+		drawDebugText("Polygon from points -> planes from polygon -> polygon from planes");
+		drawPoly(poly,255,0,0);
+		planes.fromPoly(poly.getPoints(),true);
+		poly2.fromPlanes(planes);
+		drawPoly(poly2,0,255,0);
+		r->endFrame();
+	}
+};
+class CDemoClipByPlane : public CBaseDemo {
+	Polygon2D poly;
+	PlaneSet2D planes;
+	Vec2D start;
+public:
+	CDemoClipByPlane() {
+		poly.addVertex(200,200);
+		poly.addVertex(400,200);
+		poly.addVertex(400,400);
+		poly.addVertex(200,400);
 
+	}
+	virtual void onMouseEvent(int x, int y, int button, bool bDown) {
+		if(bDown){
+			start.set(x,y);
+		}
 	}
 	virtual void onKeyEvent(int key, bool bDown)  {
 	}
@@ -389,8 +444,8 @@ public:
 	}
 	virtual void runFrame() {
 		r->beginFrame(255,255,0);
-		r->setColor(255,0,0);
-		r->drawLine(50,50,200,200,1);
+		drawPoly(poly,255,0,0);
+
 		r->endFrame();
 	}
 };
@@ -405,7 +460,7 @@ class CDemoContainer : public IBaseDemo {
 public:
 	CDemoContainer(){ 
 		current = 0;
-		addDemo(new CDemoClipByPlane);
+		addDemo(new CDemoSortVertices);
 	}
 	virtual void setRenderer(IDemoRenderer *ren) {
 		for(int i = 0; i < demos.size(); i++){
@@ -431,8 +486,12 @@ class SDLDemoRenderer : public IDemoRenderer {
     SDL_Window* window;
 	class IBaseDemo *demo ;
 	int running;
+	TTF_Font* font;
 public:
 	SDLDemoRenderer() {
+
+	}
+	void drawText() {
 
 	}
 	void setDemo(IBaseDemo *demo) {
@@ -440,7 +499,7 @@ public:
 	}
 	void createWindow() {
 		// Initialize SDL
-		SDL_Init(SDL_INIT_VIDEO);
+		SDL_Init(SDL_INIT_EVERYTHING);
 
 		// Create a window
 		window = SDL_CreateWindow("SDL Rectangle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
@@ -448,24 +507,50 @@ public:
 		// Create a renderer
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		///SDL_RenderSetScale(renderer,3,3);
+
+		if ( TTF_Init() < 0 ) {
+			printf("TTF_Init failed\n");
+		}
+		// Load font
+		font = TTF_OpenFont("fonts/open-sans/OpenSans-Regular.ttf", 15);
+		if ( !font ) {
+			printf("Font load failed\n");
+		}
+
+	}
+	virtual int drawText(int x, int y, const char *s, byte r, byte g, byte b) {
+
+		SDL_Rect dest;
+		SDL_Color foreground = { r, g, b };
+
+		SDL_Surface* text_surf = TTF_RenderText_Solid(font, s, foreground);
+		SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, text_surf);
+
+		dest.x = x;
+		dest.y = y;
+		dest.w = text_surf->w;
+		dest.h = text_surf->h;
+		SDL_RenderCopy(renderer, text, NULL, &dest);
+
+		SDL_DestroyTexture(text);
+		SDL_FreeSurface(text_surf);
+		return y + dest.h;
 	}
 	virtual void setColor(byte r, byte g, byte b, byte a = 255) {
         SDL_SetRenderDrawColor(renderer, r, g, b, a);
 	}
-	virtual void drawLine(float x, float y, float x2, float y2, int width) {
-		Vec2D a(x,y);
-		Vec2D b(x2,y2);
+	virtual void drawLine(const Vec2D &a, const Vec2D &b, int width) {
 		Vec2D v = (a-b);
 		v.normalize();
 		v = v.getPerpendicular();
 		for(float i = -width; i < width; i+=1.0f) {
 			Vec2D a2 = a + v * i;
 			Vec2D b2 = b + v * i;
-			drawLine(a2.getX(),a2.getY(),b2.getX(),b2.getY());
+			drawLine(a2,b2);
 		}
 	}
-	virtual void drawLine(float x, float y, float x2, float y2) {
-		SDL_RenderDrawLineF(renderer, x, y, x2, y2);
+	virtual void drawLine(const Vec2D &a, const Vec2D &b) {
+		SDL_RenderDrawLineF(renderer, a.getX(),a.getY(),b.getX(),b.getY());
 	}
 	virtual bool processEvents() {
         SDL_Event event;

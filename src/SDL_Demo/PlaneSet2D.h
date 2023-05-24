@@ -64,6 +64,7 @@ public:
 
 		return false;
 	}
+	bool fromPoly(const class Array<Vec2D> &pl, bool bSort = false);
 	int size() const {
 		return planes.size();
 	}
