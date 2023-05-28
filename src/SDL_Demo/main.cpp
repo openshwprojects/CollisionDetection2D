@@ -14,6 +14,7 @@
 #include <Plane2D.h>
 #include <Polygon2D.h>
 #include <PlaneSet2D.h>
+#include <cstdarg>
 
 void doBasicSelfTests() {
 
@@ -355,6 +356,8 @@ class IBaseDemo {
 protected:
 	class IDemoRenderer *r;
 public:
+	virtual const char *getName() const = 0;
+	virtual void addSetting(bool *targetBool, const char *name, int key) = 0;
 	virtual void onMouseEvent(int x, int y, int button, bool bDown) = 0;
 	virtual void onKeyEvent(int key, bool bDown) = 0;
 	virtual bool onQuit() = 0;
@@ -373,14 +376,55 @@ public:
 	virtual int drawText(int x, int y, const char *s, byte r, byte g, byte b) = 0;
 	virtual void endFrame() = 0;
 };
+struct SDemoSetting {
+	bool *boolean;
+	std::string name;
+	int key;
+};
 class CBaseDemo : public IBaseDemo {
 	int textH;
+	Array<SDemoSetting> settings;
 public:
 	void resetDebugText() {
 		textH = 30;
 	}
-	void drawDebugText(const char *s) {
-		textH = r->drawText(20,textH,s,255,250,250);
+	void drawDebugTexts() {
+		resetDebugText();
+		drawDebugText("Test");
+		drawDebugText(getName());
+		for(int i = 0; i < settings.size(); i++){
+			const SDemoSetting &s = settings[i];
+			drawDebugText(" - %s = %i - press %c to change", s.name.c_str(),*s.boolean,s.key);
+		}
+	}
+	virtual const char *getName() const {
+		return "UnnamedDemo";
+	}
+	virtual void onKeyEvent(int key, bool bDown)  {
+		if(bDown){
+			for(int i = 0; i < settings.size(); i++){
+				SDemoSetting &s = settings[i];
+				if(s.key == key){
+					*s.boolean = !*s.boolean;
+				}
+			}
+		}
+	}
+	virtual void addSetting(bool *targetBool, const char *name, int key) {
+		SDemoSetting set;
+		set.boolean = targetBool;
+		set.key = key;
+		set.name = name;
+		settings.push_back(set);
+	}
+	void drawDebugText(const char *s, ...) {    
+		char buffer[256];
+		va_list args;
+		va_start(args, s);
+		vsprintf(buffer, s, args);
+		va_end(args);
+	    
+		textH = r->drawText(20, textH, buffer, 255, 250, 250);
 	}
 	void drawPoly(const Polygon2D &p, byte r, byte g, byte b, byte a = 255) {
 		this->r->setColor(r,g,b);
@@ -394,27 +438,28 @@ class CDemoSortVertices : public CBaseDemo {
 	Polygon2D poly;
 	Polygon2D poly2;
 	PlaneSet2D planes;
+	bool bSortVertices;
 public:
 	CDemoSortVertices() {
-
+		bSortVertices = true;
+		addSetting(&bSortVertices,"Sort vertices", 'q');
+	}
+	virtual const char *getName() const {
+		return "Polygon from points -> planes from polygon -> polygon from planes";
 	}
 	virtual void onMouseEvent(int x, int y, int button, bool bDown) {
 		if(bDown){
 			poly.addVertex(x,y);
 		}
 	}
-	virtual void onKeyEvent(int key, bool bDown)  {
-	}
 	virtual bool onQuit() {
 		return true;
 	}
 	virtual void runFrame() {
 		r->beginFrame(150,150,255);
-		resetDebugText();
-		drawDebugText("Test");
-		drawDebugText("Polygon from points -> planes from polygon -> polygon from planes");
+		drawDebugTexts();
 		drawPoly(poly,255,0,0);
-		planes.fromPoly(poly.getPoints(),true);
+		planes.fromPoly(poly.getPoints(),bSortVertices);
 		poly2.fromPlanes(planes);
 		drawPoly(poly2,0,255,0);
 		r->endFrame();
@@ -436,8 +481,6 @@ public:
 		if(bDown){
 			start.set(x,y);
 		}
-	}
-	virtual void onKeyEvent(int key, bool bDown)  {
 	}
 	virtual bool onQuit() {
 		return true;
@@ -461,6 +504,12 @@ public:
 	CDemoContainer(){ 
 		current = 0;
 		addDemo(new CDemoSortVertices);
+	}
+	virtual const char *getName() const {
+		return "";
+	}
+	virtual void addSetting(bool *targetBool, const char *name, int key) {
+
 	}
 	virtual void setRenderer(IDemoRenderer *ren) {
 		for(int i = 0; i < demos.size(); i++){
