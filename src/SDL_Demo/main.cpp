@@ -357,11 +357,11 @@ protected:
 	class IDemoRenderer *r;
 public:
 	virtual const char *getName() const = 0;
-	virtual void addSetting(bool *targetBool, const char *name, int key) = 0;
 	virtual void onMouseEvent(int x, int y, int button, bool bDown) = 0;
 	virtual void onKeyEvent(int key, bool bDown) = 0;
 	virtual bool onQuit() = 0;
 	virtual void runFrame() = 0;
+	virtual void processMyEvent(int code) = 0;
 
 	void setRenderer(IDemoRenderer *ren) {
 		this->r = ren;
@@ -376,55 +376,22 @@ public:
 	virtual int drawText(int x, int y, const char *s, byte r, byte g, byte b) = 0;
 	virtual void endFrame() = 0;
 };
-struct SDemoSetting {
-	bool *boolean;
-	std::string name;
-	int key;
-};
+
 class CBaseDemo : public IBaseDemo {
-	int textH;
-	Array<SDemoSetting> settings;
+protected:
+    class CDemoContainer* container;
 public:
-	void resetDebugText() {
-		textH = 30;
+	void setContainer(CDemoContainer *cc) {
+		this->container = cc;
 	}
-	void drawDebugTexts() {
-		resetDebugText();
-		drawDebugText("Test");
-		drawDebugText(getName());
-		for(int i = 0; i < settings.size(); i++){
-			const SDemoSetting &s = settings[i];
-			drawDebugText(" - %s = %i - press %c to change", s.name.c_str(),*s.boolean,s.key);
-		}
+	virtual void processMyEvent(int code) {
+
+	}
+	virtual void onDemoInit() {
+
 	}
 	virtual const char *getName() const {
 		return "UnnamedDemo";
-	}
-	virtual void onKeyEvent(int key, bool bDown)  {
-		if(bDown){
-			for(int i = 0; i < settings.size(); i++){
-				SDemoSetting &s = settings[i];
-				if(s.key == key){
-					*s.boolean = !*s.boolean;
-				}
-			}
-		}
-	}
-	virtual void addSetting(bool *targetBool, const char *name, int key) {
-		SDemoSetting set;
-		set.boolean = targetBool;
-		set.key = key;
-		set.name = name;
-		settings.push_back(set);
-	}
-	void drawDebugText(const char *s, ...) {    
-		char buffer[256];
-		va_list args;
-		va_start(args, s);
-		vsprintf(buffer, s, args);
-		va_end(args);
-	    
-		textH = r->drawText(20, textH, buffer, 255, 250, 250);
 	}
 	void drawPoly(const Polygon2D &p, byte r, byte g, byte b, byte a = 255) {
 		this->r->setColor(r,g,b);
@@ -433,38 +400,63 @@ public:
 			this->r->drawLine(p[i],p[n]);
 		}
 	}
-};
-class CDemoSortVertices : public CBaseDemo {
-	Polygon2D poly;
-	Polygon2D poly2;
-	PlaneSet2D planes;
-	bool bSortVertices;
-public:
-	CDemoSortVertices() {
-		bSortVertices = true;
-		addSetting(&bSortVertices,"Sort vertices", 'q');
-	}
-	virtual const char *getName() const {
-		return "Polygon from points -> planes from polygon -> polygon from planes";
-	}
-	virtual void onMouseEvent(int x, int y, int button, bool bDown) {
-		if(bDown){
-			poly.addVertex(x,y);
-		}
-	}
-	virtual bool onQuit() {
-		return true;
-	}
-	virtual void runFrame() {
-		r->beginFrame(150,150,255);
-		drawDebugTexts();
-		drawPoly(poly,255,0,0);
-		planes.fromPoly(poly.getPoints(),bSortVertices);
-		poly2.fromPlanes(planes);
-		drawPoly(poly2,0,255,0);
-		r->endFrame();
+	virtual void onKeyEvent(int key, bool bDown) {
+
 	}
 };
+
+
+#include "DemoSortVertices.h"
+#include "DemoContainer.h"
+
+
+CDemoSortVertices::CDemoSortVertices() {
+    bSortVertices = true;
+    bDrawRaw = true;
+    bDrawConvex = true;
+}
+
+void CDemoSortVertices::onDemoInit() {
+    container->addSetting(&bSortVertices, "Sort vertices", -1);
+    container->addSetting(&bDrawRaw, "Draw user-drawn poly", -1);
+    container->addSetting(&bDrawConvex, "Draw regenerated convex", -1);
+    container->addSetting(101, "Remove last vertex", -1);
+}
+
+void CDemoSortVertices::processMyEvent(int code) {
+	if(code == 101) {
+		poly.removeLastVertex();
+	}
+}
+const char* CDemoSortVertices::getName() const {
+    return "Polygon from points -> planes from polygon -> polygon from planes";
+}
+
+void CDemoSortVertices::onMouseEvent(int x, int y, int button, bool bDown) {
+    if (bDown) {
+        poly.addVertex(x, y);
+    }
+}
+
+bool CDemoSortVertices::onQuit() {
+    return true;
+}
+
+void CDemoSortVertices::runFrame() {
+    r->beginFrame(150, 150, 255);
+    container->drawDebugTexts();
+    if (bDrawRaw) {
+        drawPoly(poly, 255, 0, 0);
+    }
+    planes.fromPoly(poly.getPoints(), bSortVertices);
+    poly2.fromPlanes(planes);
+    if (bDrawConvex) {
+        drawPoly(poly2, 0, 255, 0);
+    }
+    r->endFrame();
+}
+
+
 class CDemoClipByPlane : public CBaseDemo {
 	Polygon2D poly;
 	PlaneSet2D planes;
@@ -492,44 +484,152 @@ public:
 		r->endFrame();
 	}
 };
-class CDemoContainer : public IBaseDemo {
-	Array<IBaseDemo*> demos;
-	int current;
 
-	void addDemo(IBaseDemo *d) {
-		demos.push_back(d);
-		d->setRenderer(r);
-	}
-public:
-	CDemoContainer(){ 
-		current = 0;
-		addDemo(new CDemoSortVertices);
-	}
-	virtual const char *getName() const {
-		return "";
-	}
-	virtual void addSetting(bool *targetBool, const char *name, int key) {
 
-	}
-	virtual void setRenderer(IDemoRenderer *ren) {
-		for(int i = 0; i < demos.size(); i++){
-			demos[i]->setRenderer(ren);
-		}
-		IBaseDemo::setRenderer(ren);
-	}
-	virtual void onMouseEvent(int x, int y, int button, bool bDown) {
-		demos[current]->onMouseEvent(x,y,button,bDown);
-	}
-	virtual void onKeyEvent(int key, bool bDown)  {
-		demos[current]->onKeyEvent(key,bDown);
-	}
-	virtual bool onQuit() {
-		return demos[current]->onQuit();
-	}
-	virtual void runFrame() {
-		demos[current]->runFrame();
-	}
+#include "DemoContainer.h"
+
+enum {
+	MY_EVENT_FIRST = 10,
+	MY_EVENT_NEXT_DEMO,
+	MY_EVENT_PREV_DEMO,
 };
+CDemoContainer::CDemoContainer() {
+    settingsKeys = "qwertyuiopasdfghjklzxcvbnm";
+    nextSettingsKey = 0;
+    current = 0;
+    addDemo(new CDemoSortVertices());
+}
+
+void CDemoContainer::addDemo(CBaseDemo* d) {
+    demos.push_back(d);
+	d->setContainer(this);
+    d->setRenderer(r);
+	settings.clear();
+	addSetting(MY_EVENT_NEXT_DEMO,"",'q');
+	addSetting(MY_EVENT_PREV_DEMO,"",'w');
+	d->onDemoInit();
+}
+
+void CDemoContainer::resetDebugText() {
+    textH = 30;
+}
+
+void CDemoContainer::drawDebugTexts() {
+    resetDebugText();
+	drawDebugText("Demo %i/%i, use Q and W to change", current,demos.size());
+    drawDebugText(demos[current]->getName());
+    for (int i = 0; i < settings.size(); i++) {
+        const SDemoSetting& s = settings[i];
+		if(s.name.size()) {
+			if(s.boolean) {
+				drawDebugText(" - %s = %i - press %c to change", s.name.c_str(), *s.boolean, s.key);
+			} else {
+				drawDebugText(" - %s = press %c", s.name.c_str(), s.key);
+			}
+		}
+    }
+}
+
+void CDemoContainer::processMyEvent(int code) {
+	if(code == MY_EVENT_NEXT_DEMO) {
+		printf("nxt");
+	} else if(code == MY_EVENT_PREV_DEMO) {
+		printf("prv");
+	}
+	demos[current]->processMyEvent(code);
+}
+void CDemoContainer::onKeyEvent(int key, bool bDown) {
+    if (bDown) {
+        for (int i = 0; i < settings.size(); i++) {
+            SDemoSetting& s = settings[i];
+            if (s.key == key) {
+				if(s.boolean) {
+					*s.boolean = !*s.boolean;
+				}
+				if(s.eventIndex) {
+					processMyEvent(s.eventIndex);
+				}
+            }
+        }
+    }
+    demos[current]->onKeyEvent(key, bDown);
+}
+
+void CDemoContainer::drawDebugText(const char* s, ...) {
+    char buffer[256];
+    va_list args;
+    va_start(args, s);
+    vsprintf(buffer, s, args);
+    va_end(args);
+
+    textH = r->drawText(20, textH, buffer, 255, 250, 250);
+}
+bool CDemoContainer::isKeyInUse(int key) const {
+	for(int i = 0; i < settings.size(); i++) {
+		if(settings[i].key == key)
+			return true;
+	}
+	return false;
+}
+void CDemoContainer::prepareSettingKey(int *key) {
+    if (*key == -1) {
+		do {
+			*key = settingsKeys[nextSettingsKey];
+			nextSettingsKey++;
+		} while(isKeyInUse(*key));
+    }
+}
+
+void CDemoContainer::addSetting(int targetEvent, const char* name, int key) {
+    prepareSettingKey(&key);
+    SDemoSetting set;
+    set.boolean = 0;
+	set.eventIndex = targetEvent;
+    set.key = key;
+    set.name = name;
+    settings.push_back(set);
+}
+void CDemoContainer::addSetting(bool* targetBool, const char* name, int key) {
+    prepareSettingKey(&key);
+    SDemoSetting set;
+    set.boolean = targetBool;
+	set.eventIndex = 0;
+    set.key = key;
+    set.name = name;
+    settings.push_back(set);
+}
+
+void CDemoContainer::runDemo(IBaseDemo* d) {
+
+}
+
+const char* CDemoContainer::getName() const {
+    return "";
+}
+
+void CDemoContainer::setRenderer(IDemoRenderer* ren) {
+    for (int i = 0; i < demos.size(); i++) {
+        demos[i]->setRenderer(ren);
+    }
+    IBaseDemo::setRenderer(ren);
+}
+
+void CDemoContainer::onMouseEvent(int x, int y, int button, bool bDown) {
+    demos[current]->onMouseEvent(x, y, button, bDown);
+}
+
+
+
+bool CDemoContainer::onQuit() {
+    return demos[current]->onQuit();
+}
+
+void CDemoContainer::runFrame() {
+    demos[current]->runFrame();
+}
+
+
+
 class SDLDemoRenderer : public IDemoRenderer {
 	SDL_Renderer* renderer;
     SDL_Window* window;
@@ -538,7 +638,7 @@ class SDLDemoRenderer : public IDemoRenderer {
 	TTF_Font* font;
 public:
 	SDLDemoRenderer() {
-
+		font = 0;
 	}
 	void drawText() {
 
@@ -573,8 +673,14 @@ public:
 		SDL_Color foreground = { r, g, b };
 
 		SDL_Surface* text_surf = TTF_RenderText_Solid(font, s, foreground);
+		if(text_surf == 0) {
+			return y;
+		}
 		SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, text_surf);
-
+		if(text == 0) {
+			SDL_FreeSurface(text_surf);
+			return y;
+		}
 		dest.x = x;
 		dest.y = y;
 		dest.w = text_surf->w;

@@ -37,6 +37,12 @@ public:
 	int elementSize() const {
 		return sizeof(T);
 	}
+	void removeLast() {
+		if(size() == 0){
+			return;
+		}
+		resize(size()-1);
+	}
 
 };
 

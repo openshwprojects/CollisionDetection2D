@@ -208,6 +208,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DemoContainer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DemoSortVertices.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Line2D.h"
 				>
 			</File>

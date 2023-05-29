@@ -9,6 +9,9 @@ class Polygon2D {
 public:
 
 
+	void removeLastVertex() {
+		points.removeLast();
+	}
 	int size() const {
 		return points.size();
 	}
