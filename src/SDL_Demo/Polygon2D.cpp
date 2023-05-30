@@ -70,6 +70,11 @@ void Polygon2D::clipByPlane(const Plane2D &pl) {
 	}
 	points = nA;
 }
+void Polygon2D::addToBB(class BBox2D &bb) const {
+	for(int i = 0; i < points.size(); i++){
+		bb.addPoint(points[i]);
+	}
+}
 void Polygon2D::fromPlanes(const PlaneSet2D &planes) {
 	points.clear();
 	if(planes.size() < 3) {

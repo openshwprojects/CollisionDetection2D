@@ -413,6 +413,7 @@ public:
 CDemoSortVertices::CDemoSortVertices() {
     bSortVertices = true;
     bDrawRaw = true;
+    bDrawAABB = true;
     bDrawConvex = true;
 }
 
@@ -420,6 +421,7 @@ void CDemoSortVertices::onDemoInit() {
     container->addSetting(&bSortVertices, "Sort vertices", -1);
     container->addSetting(&bDrawRaw, "Draw user-drawn poly", -1);
     container->addSetting(&bDrawConvex, "Draw regenerated convex", -1);
+    container->addSetting(&bDrawAABB, "Draw AABB", -1);
     container->addSetting(101, "Remove last vertex", -1);
 }
 
@@ -453,6 +455,15 @@ void CDemoSortVertices::runFrame() {
     if (bDrawConvex) {
         drawPoly(poly2, 0, 255, 0);
     }
+	if(bDrawAABB) {
+		Polygon2D tmp;
+		BBox2D box;
+		tmp.addToBB(box);
+		for(int i = 0; i < 4; i++){
+			tmp.addVertex(box.getCorner(i));
+		}
+        drawPoly(tmp, 0, 0, 255);
+	}
     r->endFrame();
 }
 

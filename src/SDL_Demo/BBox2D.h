@@ -61,4 +61,18 @@ public:
 			return a;
 		return b;
 	}
+    Vec2D getCorner(int cornerIndex) const {
+        switch (cornerIndex) {
+            case 0:
+                return mins;
+            case 1:
+                return Vec2D(mins.getX(), maxs.getY());
+            case 2:
+                return maxs;
+            case 3:
+                return Vec2D(maxs.getX(), mins.getY());
+            default:
+                return Vec2D(0.0f, 0.0f);
+        }
+    }
 };

@@ -5,6 +5,7 @@ class CDemoSortVertices : public CBaseDemo {
     bool bSortVertices;
     bool bDrawRaw;
     bool bDrawConvex;
+    bool bDrawAABB;
 
 public:
     CDemoSortVertices();

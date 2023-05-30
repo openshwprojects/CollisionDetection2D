@@ -43,6 +43,7 @@ public:
 	// removes everything in front of plane
 	void clipByPlane(const class Plane2D &pl);
 	void fromPlanes(const class PlaneSet2D &planes);
+	void addToBB(class BBox2D &bb) const;
 };
 
 #endif // __POLYGON2D_H__
