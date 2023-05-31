@@ -458,7 +458,7 @@ void CDemoSortVertices::runFrame() {
 	if(bDrawAABB) {
 		Polygon2D tmp;
 		BBox2D box;
-		tmp.addToBB(box);
+		poly2.addToBB(box);
 		for(int i = 0; i < 4; i++){
 			tmp.addVertex(box.getCorner(i));
 		}
