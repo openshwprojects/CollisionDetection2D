@@ -1,3 +1,10 @@
+#ifndef __DEMOSORTVERTICES_H__
+#define __DEMOSORTVERTICES_H__
+
+#include <Polygon2D.h>
+#include <PlaneSet2D.h>
+#include "BaseDemo.h"
+
 class CDemoSortVertices : public CBaseDemo {
     Polygon2D poly;
     Polygon2D poly2;
@@ -18,3 +25,4 @@ public:
 	virtual void processMyEvent(int code);
 };
 
+#endif // __DEMOSORTVERTICES_H__

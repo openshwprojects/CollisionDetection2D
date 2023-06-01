@@ -189,6 +189,10 @@
 				RelativePath=".\Polygon2D.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\SelfTests.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -205,14 +209,6 @@
 			</File>
 			<File
 				RelativePath=".\Common.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DemoContainer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DemoSortVertices.h"
 				>
 			</File>
 			<File
@@ -233,6 +229,50 @@
 			</File>
 			<File
 				RelativePath=".\Vec2.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Demos"
+			>
+			<File
+				RelativePath=".\Demos\BaseDemo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\BaseDemo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\DemoContainer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DemoContainer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\DemoSortVertices.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DemoSortVertices.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\IBaseDemo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\IDemoRenderer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\SDLDemoRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\SDLDemoRenderer.h"
 				>
 			</File>
 		</Filter>

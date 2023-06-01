@@ -1,6 +1,10 @@
 #ifndef CDEMO_CONTAINER_H
 #define CDEMO_CONTAINER_H
 
+#include <string.h>
+#include <Common.h>
+#include <Demos/IBaseDemo.h>
+
 struct SDemoSetting {
     bool* boolean;
     int key;
