@@ -248,7 +248,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DemoContainer.h"
+				RelativePath=".\Demos\DemoContainer.h"
 				>
 			</File>
 			<File
@@ -256,7 +256,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DemoSortVertices.h"
+				RelativePath=".\Demos\DemoSortVertices.h"
 				>
 			</File>
 			<File
