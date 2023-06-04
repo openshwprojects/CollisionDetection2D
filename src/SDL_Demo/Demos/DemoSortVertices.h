@@ -3,7 +3,7 @@
 
 #include <Polygon2D.h>
 #include <PlaneSet2D.h>
-#include "BaseDemo.h"
+#include <DemoSystem/BaseDemo.h>
 
 class CDemoSortVertices : public CBaseDemo {
     Polygon2D poly;

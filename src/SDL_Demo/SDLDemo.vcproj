@@ -236,22 +236,6 @@
 			Name="Demos"
 			>
 			<File
-				RelativePath=".\Demos\BaseDemo.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Demos\BaseDemo.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Demos\DemoContainer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Demos\DemoContainer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Demos\DemoSortVertices.cpp"
 				>
 			</File>
@@ -259,20 +243,40 @@
 				RelativePath=".\Demos\DemoSortVertices.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="DemoSystem"
+			>
 			<File
-				RelativePath=".\Demos\IBaseDemo.h"
+				RelativePath=".\DemoSystem\BaseDemo.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Demos\IDemoRenderer.h"
+				RelativePath=".\DemoSystem\BaseDemo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Demos\SDLDemoRenderer.cpp"
+				RelativePath=".\DemoSystem\DemoContainer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Demos\SDLDemoRenderer.h"
+				RelativePath=".\DemoSystem\DemoContainer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DemoSystem\IBaseDemo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DemoSystem\IDemoRenderer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DemoSystem\SDLDemoRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DemoSystem\SDLDemoRenderer.h"
 				>
 			</File>
 		</Filter>

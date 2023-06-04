@@ -1,8 +1,8 @@
 
 
 #include "DemoSortVertices.h"
-#include "DemoContainer.h"
-#include "IDemoRenderer.h"
+#include <DemoSystem/DemoContainer.h>
+#include <DemoSystem/IDemoRenderer.h>
 #include <BBox2D.h>
 
 

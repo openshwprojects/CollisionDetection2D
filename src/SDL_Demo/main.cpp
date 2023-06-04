@@ -1,7 +1,7 @@
 
-#include <Demos/DemoContainer.h>
-#include <Demos/IDemoRenderer.h>
-#include <Demos/SDLDemoRenderer.h>
+#include <DemoSystem/DemoContainer.h>
+#include <DemoSystem/IDemoRenderer.h>
+#include <DemoSystem/SDLDemoRenderer.h>
 
 void doBasicSelfTests();
 
