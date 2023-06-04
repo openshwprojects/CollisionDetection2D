@@ -64,6 +64,8 @@ public:
 
 		return false;
 	}
+	bool fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D &c, bool bSort = false);
+	bool fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D &c, const Vec2D &d, bool bSort = false);
 	bool fromPoly(const class Array<Vec2D> &pl, bool bSort = false);
 	int size() const {
 		return planes.size();

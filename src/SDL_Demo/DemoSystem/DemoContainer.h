@@ -13,16 +13,18 @@ struct SDemoSetting {
 };
 
 class CDemoContainer : public IBaseDemo {
-    std::vector<class IBaseDemo*> demos;
+	Array<class CBaseDemo*> demos;
     int current;
     std::vector<SDemoSetting> settings;
     int nextSettingsKey;
     const char* settingsKeys;
     int textH;
 
+	void initDemo();
     void addDemo(class CBaseDemo* d);
 	bool isKeyInUse(int key) const;
 	void prepareSettingKey(int *key);
+	void scrollDemos(int ofs);
 public:
     CDemoContainer();
     void resetDebugText();

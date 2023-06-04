@@ -43,6 +43,14 @@ public:
 		}
 		resize(size()-1);
 	}
+	int scrollIndex(int cur, int d) const {
+		cur += d;
+		if(cur >= size())
+			cur = 0;
+		else if(cur < 0)
+			cur = size()-1;
+		return cur;
+	}
 
 };
 

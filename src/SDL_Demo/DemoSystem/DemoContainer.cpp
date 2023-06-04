@@ -1,5 +1,6 @@
 #include "DemoContainer.h"
 #include <Demos/DemoSortVertices.h>
+#include <Demos/DemoTrace.h>
 #include "IDemoRenderer.h"
 #include <stdarg.h>
 
@@ -13,16 +14,24 @@ CDemoContainer::CDemoContainer() {
     nextSettingsKey = 0;
     current = 0;
     addDemo(new CDemoSortVertices());
+    addDemo(new CDemoTrace());
 }
 
+void CDemoContainer::scrollDemos(int ofs) {
+	current = demos.scrollIndex(current,ofs);
+	initDemo();
+}
+void CDemoContainer::initDemo() {
+	settings.clear();
+	addSetting(MY_EVENT_NEXT_DEMO,"",'q');
+	addSetting(MY_EVENT_PREV_DEMO,"",'w');
+	demos[current]->onDemoInit();
+}
 void CDemoContainer::addDemo(CBaseDemo* d) {
     demos.push_back(d);
 	d->setContainer(this);
     d->setRenderer(r);
-	settings.clear();
-	addSetting(MY_EVENT_NEXT_DEMO,"",'q');
-	addSetting(MY_EVENT_PREV_DEMO,"",'w');
-	d->onDemoInit();
+	initDemo();
 }
 
 void CDemoContainer::resetDebugText() {
@@ -47,9 +56,9 @@ void CDemoContainer::drawDebugTexts() {
 
 void CDemoContainer::processMyEvent(int code) {
 	if(code == MY_EVENT_NEXT_DEMO) {
-		printf("nxt");
+		scrollDemos(1);
 	} else if(code == MY_EVENT_PREV_DEMO) {
-		printf("prv");
+		scrollDemos(-1);
 	}
 	demos[current]->processMyEvent(code);
 }

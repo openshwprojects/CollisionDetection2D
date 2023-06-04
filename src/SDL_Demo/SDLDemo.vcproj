@@ -178,6 +178,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hull2D.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -212,6 +216,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hull2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hull2DList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Line2D.h"
 				>
 			</File>
@@ -241,6 +253,14 @@
 			</File>
 			<File
 				RelativePath=".\Demos\DemoSortVertices.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\DemoTrace.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\DemoTrace.h"
 				>
 			</File>
 		</Filter>

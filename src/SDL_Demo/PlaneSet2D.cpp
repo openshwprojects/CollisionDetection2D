@@ -26,6 +26,21 @@ void SortPolygon(Array<Vec2D> &pl) {
 	center /= pl.size();
 	qsort(pl.getArray(),pl.size(),pl.elementSize(),compareVecs);
 }
+bool PlaneSet2D::fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D &c, const Vec2D &d, bool bSort) {
+	Array<Vec2D> pts;
+	pts.push_back(a);
+	pts.push_back(b);
+	pts.push_back(c);
+	pts.push_back(d);
+	return fromPoly(pts,bSort);
+}
+bool PlaneSet2D::fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D &c, bool bSort) {
+	Array<Vec2D> pts;
+	pts.push_back(a);
+	pts.push_back(b);
+	pts.push_back(c);
+	return fromPoly(pts,bSort);
+}
 bool PlaneSet2D::fromPoly(const class Array<Vec2D> &pl, bool bSort) {
 	planes.clear();
 	if(pl.size() < 3) {
