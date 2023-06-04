@@ -4,7 +4,7 @@
 #include <DemoSystem/DemoContainer.h>
 #include <DemoSystem/IDemoRenderer.h>
 #include <BBox2D.h>
-
+#include <Trace2D.h>
 
 CDemoTrace::CDemoTrace() {
 }
@@ -40,6 +40,9 @@ bool CDemoTrace::onQuit() {
 }
 
 void CDemoTrace::runFrame() {
+	CTrace2D tr;
+	tr.setup(pointA,pointB);
+
     r->beginFrame(150, 150, 255);
     container->drawDebugTexts();
 	for(int i = 0; i < hulls.size(); i++) {

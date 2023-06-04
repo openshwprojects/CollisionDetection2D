@@ -197,6 +197,10 @@
 				RelativePath=".\SelfTests.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Trace2D.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

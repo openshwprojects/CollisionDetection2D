@@ -43,12 +43,13 @@ public:
 		x = RandomFloatRange(minX,maxX);
 		y = RandomFloatRange(minY,maxY);
 	}
-    void normalize() {
+    float normalize() {
         float len = length();
         if (len != 0.0f) {
             x /= len;
             y /= len;
         }
+		return len;
     }
 
     float getX() const {
