@@ -31,5 +31,6 @@ public:
 	Hull2D&operator[](int i) {
 		return hulls[i];
 	}
+	bool trace(class CTrace2D &tr) const;
 };
 #endif // __HULL2D_LIST_H__

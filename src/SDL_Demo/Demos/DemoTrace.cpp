@@ -49,6 +49,14 @@ void CDemoTrace::runFrame() {
 		const Hull2D &h = hulls[i];
 		this->drawPoly(h.getPoly(),100,0,0);
 	}
+	hulls.trace(tr);
+	if(tr.hasHit()) {
+		r->setColor(255,0,0);
+		r->drawLine(tr.getStart(),tr.getHit());
+	} else {
+		r->setColor(0,255,0);
+		r->drawLine(tr.getStart(),tr.getEnd());
+	}
 	r->drawText(pointA.getX(),pointA.getY(),"A",0,0,0);
 	r->drawText(pointB.getX(),pointB.getY(),"B",0,0,0);
     r->endFrame();

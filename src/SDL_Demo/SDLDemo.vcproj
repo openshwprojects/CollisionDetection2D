@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hull2DList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>

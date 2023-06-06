@@ -11,6 +11,7 @@ public:
 	void fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort = false);
 	void fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D&c, const Vec2D&d, bool bSort = false);
 	void fromPoly(const Array<Vec2D> &poly, bool bSort = false);
+	bool trace(class CTrace2D &tr) const;
 	const Polygon2D &getPoly() const {
 		return vertices;
 	}
