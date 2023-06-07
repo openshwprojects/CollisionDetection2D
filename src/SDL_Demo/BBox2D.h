@@ -1,4 +1,8 @@
+#ifndef __BBOX2D_H__
+#define __BBOX2D_H__
+
 #include <Vec2.h>
+#include <Plane2D.h>
 
 class BBox2D {
 	Vec2D mins, maxs;
@@ -75,4 +79,22 @@ public:
                 return Vec2D(0.0f, 0.0f);
         }
     }
+	Plane2D getPlane(int sideIndex) const {
+		int ni = (sideIndex + 1) % 4;
+		Plane2D pl;
+		pl.fromTwoPoints(getCorner(ni),getCorner(sideIndex));
+		return pl;
+	}
+	float getLowestCornerDot(const Vec2D &v) const {
+		float best = getCorner(0).dot(v);
+		for(int i = 1; i < 4; i++) {
+			float d = getCorner(i).dot(v);
+			if(d < best) {
+				best = d;
+			}
+		}
+		return best;
+	}
 };
+
+#endif // __BBOX2D_H__

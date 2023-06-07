@@ -4,15 +4,23 @@
 void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, const Vec2D&d, bool bSort) {
 	planes.fromPoly(a,b,c,d,bSort);
 	vertices.fromPlanes(planes);
+	vertices.calcBounds(bb);
 }
 void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort) {
 	planes.fromPoly(a,b,c,bSort);
 	vertices.fromPlanes(planes);
+	vertices.calcBounds(bb);
+}
+void Hull2D::addAxisAlignedPlanesFromBounds() {
+	for(int i = 0; i < 4; i++) {
+		Plane2D pl = bb.getPlane(i);
+		planes.addPlane(pl);
+	}
 }
 void Hull2D::fromPoly(const Array<Vec2D> &poly, bool bSort) {
 	planes.fromPoly(poly,bSort);
 	vertices.fromPlanes(planes);
-
+	vertices.calcBounds(bb);
 }
 bool Hull2D::trace(class CTrace2D &tr) const {
 	bool bHit = false;
@@ -26,6 +34,11 @@ bool Hull2D::trace(class CTrace2D &tr) const {
 	for(int i = 0; i < planes.size(); i++) {
 		const Plane2D &pl = planes[i];
 		float dist = pl.getDistance();
+		// NOTE: this will work only if we have force-added
+		// extra axis aligned planes
+		if(tr.isSphere()) {
+			dist -= tr.getRadius();
+		}
 		float ds = tr.getStart().dot(pl.getNormal()) + dist;
 		float de = tr.getEnd().dot(pl.getNormal()) + dist;
 		if(de > 0) {

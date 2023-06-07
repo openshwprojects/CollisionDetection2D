@@ -90,7 +90,10 @@ public:
 		Vec2D tmp = *this - p;
 		return tmp.lengthSq();
     }
-
+	Vec2D getNormalized() const {
+		Vec2D r = *this;
+		return r;
+	}
     // Method to get the perpendicular vector
     Vec2D getPerpendicular() const {
         if (x == 0 && y == 0) {

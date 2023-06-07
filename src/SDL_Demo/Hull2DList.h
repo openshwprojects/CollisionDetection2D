@@ -10,20 +10,25 @@ public:
 	int size() const {
 		return hulls.size();
 	}
-	void addPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort = false) {
+	Hull2D &addHull2D(const Hull2D &h) {
+		int ri = hulls.size();
+		hulls.push_back(h);
+		return hulls[ri];
+	}
+	Hull2D &addPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort = false) {
 		Hull2D h;
 		h.fromPoly(a,b,c,bSort);
-		hulls.push_back(h);
+		return addHull2D(h);
 	}
-	void addPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, const Vec2D&d, bool bSort = false) {
+	Hull2D &addPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, const Vec2D&d, bool bSort = false) {
 		Hull2D h;
 		h.fromPoly(a,b,c,d,bSort);
-		hulls.push_back(h);
+		return addHull2D(h);
 	}
-	void addPoly(const Array<Vec2D> &ar, bool bSort = false) {
+	Hull2D &addPoly(const Array<Vec2D> &ar, bool bSort = false) {
 		Hull2D h;
 		h.fromPoly(ar,bSort);
-		hulls.push_back(h);
+		return addHull2D(h);
 	}
 	const Hull2D&operator[](int i) const {
 		return hulls[i];
