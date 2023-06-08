@@ -7,9 +7,13 @@
 
 struct SDemoSetting {
     bool* boolean;
+	float *pfloat;
     int key;
     std::string name;
 	int eventIndex;
+	float step;
+	float min;
+	float max;
 };
 
 class CDemoContainer : public IBaseDemo {
@@ -34,6 +38,7 @@ public:
     void drawDebugText(const char* s, ...);
     virtual void addSetting(bool* targetBool, const char* name, int key);
     virtual void addSetting(int targetEvent, const char* name, int key);
+    virtual void addSetting(float *value, float step, float min, float max, const char* name, int keyU, int keyD);
     void runDemo(IBaseDemo* d);
     virtual const char* getName() const;
     virtual void setRenderer(IDemoRenderer* ren);

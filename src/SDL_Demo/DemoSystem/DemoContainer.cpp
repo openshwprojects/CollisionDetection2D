@@ -47,6 +47,8 @@ void CDemoContainer::drawDebugTexts() {
 		if(s.name.size()) {
 			if(s.boolean) {
 				drawDebugText(" - %s = %i - press %c to change", s.name.c_str(), *s.boolean, s.key);
+			} if(s.pfloat) {
+				drawDebugText(" - %s = %f - press %c %c to change", s.name.c_str(), *s.pfloat, s.keyU, s.keyD);
 			} else {
 				drawDebugText(" - %s = press %c", s.name.c_str(), s.key);
 			}
@@ -74,6 +76,7 @@ void CDemoContainer::onKeyEvent(int key, bool bDown) {
 					processMyEvent(s.eventIndex);
 				}
             }
+
         }
     }
     demos[current]->onKeyEvent(key, bDown);
@@ -107,15 +110,32 @@ void CDemoContainer::prepareSettingKey(int *key) {
 void CDemoContainer::addSetting(int targetEvent, const char* name, int key) {
     prepareSettingKey(&key);
     SDemoSetting set;
+    set.pfloat = 0;
     set.boolean = 0;
 	set.eventIndex = targetEvent;
     set.key = key;
     set.name = name;
     settings.push_back(set);
 }
+void CDemoContainer::addSetting(float *value, float step, float min, float max, const char* name, int keyU, int keyD) {
+    prepareSettingKey(&keyU);
+    prepareSettingKey(&keyD);
+    SDemoSetting set;
+    set.pfloat = value;
+    set.step = step;
+    set.min = min;
+    set.max = max;
+    set.boolean = 0;
+	set.eventIndex = 0;
+    set.key = keyU;
+    set.key = keyD;
+    set.name = name;
+    settings.push_back(set);
+}
 void CDemoContainer::addSetting(bool* targetBool, const char* name, int key) {
     prepareSettingKey(&key);
     SDemoSetting set;
+    set.pfloat = 0;
     set.boolean = targetBool;
 	set.eventIndex = 0;
     set.key = key;

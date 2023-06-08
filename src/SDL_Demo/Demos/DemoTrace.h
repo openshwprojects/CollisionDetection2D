@@ -8,6 +8,7 @@ class CDemoTrace : public CBaseDemo {
 	Hull2DList hulls;
 	Vec2D pointA, pointB;
 	int curType;
+	float traceRadius;
 public:
     CDemoTrace();
 

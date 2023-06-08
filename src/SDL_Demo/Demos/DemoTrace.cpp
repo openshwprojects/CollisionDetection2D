@@ -8,11 +8,13 @@
 
 CDemoTrace::CDemoTrace() {
 	curType = TT_POINT;
+	traceRadius = 5.0f;
 }
 
 void CDemoTrace::onDemoInit() {
     //container->addSetting(&bDrawAABB, "Draw AABB", -1);
     container->addSetting(101, "Next trace type", -1);
+    container->addSetting(&traceRadius, 5, 1, 100, "Trace Radius");
 	hulls.addPoly(Vec2D(200,100),Vec2D(500,100), Vec2D(500,50), Vec2D(200,50),true);
 	hulls.addPoly(Vec2D(200,200),Vec2D(300,200), Vec2D(300,100), Vec2D(200,100),true);
 	Hull2D &lp = hulls.addPoly(Vec2D(200,200),Vec2D(300,200), Vec2D(250,300),true);
@@ -63,7 +65,7 @@ void CDemoTrace::runFrame() {
 	if(curType == TT_POINT) {
 		tr.setupRay(pointA,pointB);
 	} else {
-		tr.setupSphere(pointA,pointB,15);
+		tr.setupSphere(pointA,pointB,traceRadius);
 	}
 	hulls.trace(tr);
 	if(tr.hasHit()) {
