@@ -41,6 +41,15 @@ bool PlaneSet2D::fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D &c, 
 	pts.push_back(c);
 	return fromPoly(pts,bSort);
 }
+bool PlaneSet2D::hasPlane(const Plane2D &pl) const {
+	for(int i = 0; i < size(); i++) {
+		const Plane2D &ip = planes[i];
+		if(ip.compare(pl, 0.01f, 0.01f)) {
+			return true;
+		}
+	}
+	return false;
+}
 bool PlaneSet2D::fromPoly(const class Array<Vec2D> &pl, bool bSort) {
 	planes.clear();
 	if(pl.size() < 3) {

@@ -28,6 +28,13 @@ public:
 	void addY(float f){ 
 		y+=f;
 	}
+	bool compare(const Vec2D &o, float eps) const {
+		if(abs(o.x-this->x)>eps)
+			return false;
+		if(abs(o.y-this->y)>eps)
+			return false;
+		return true;
+	}
 	bool isWithin(const Vec2D &p, float marg) const {
 		return distanceToSq(p) < marg*marg;
 	}

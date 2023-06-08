@@ -3,24 +3,27 @@
 
 void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, const Vec2D&d, bool bSort) {
 	planes.fromPoly(a,b,c,d,bSort);
-	vertices.fromPlanes(planes);
-	vertices.calcBounds(bb);
+	rebuildPolygonFromPlanes();
 }
 void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort) {
 	planes.fromPoly(a,b,c,bSort);
+	rebuildPolygonFromPlanes();
+}
+void Hull2D::rebuildPolygonFromPlanes() {
 	vertices.fromPlanes(planes);
 	vertices.calcBounds(bb);
 }
 void Hull2D::addAxisAlignedPlanesFromBounds() {
 	for(int i = 0; i < 4; i++) {
 		Plane2D pl = bb.getPlane(i);
-		planes.addPlane(pl);
+		if(planes.hasPlane(pl)==false) {
+			planes.addPlane(pl);
+		}
 	}
 }
 void Hull2D::fromPoly(const Array<Vec2D> &poly, bool bSort) {
 	planes.fromPoly(poly,bSort);
-	vertices.fromPlanes(planes);
-	vertices.calcBounds(bb);
+	rebuildPolygonFromPlanes();
 }
 bool Hull2D::trace(class CTrace2D &tr) const {
 	bool bHit = false;

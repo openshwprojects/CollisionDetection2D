@@ -15,7 +15,10 @@ void CDemoTrace::onDemoInit() {
     container->addSetting(101, "Next trace type", -1);
 	hulls.addPoly(Vec2D(200,100),Vec2D(500,100), Vec2D(500,50), Vec2D(200,50),true);
 	hulls.addPoly(Vec2D(200,200),Vec2D(300,200), Vec2D(300,100), Vec2D(200,100),true);
-	hulls.addPoly(Vec2D(200,200),Vec2D(300,200), Vec2D(250,300),true).addAxisAlignedPlanesFromBounds();
+	Hull2D &lp = hulls.addPoly(Vec2D(200,200),Vec2D(300,200), Vec2D(250,300),true);
+	lp.addAxisAlignedPlanesFromBounds();
+	// just to test if it still works
+	lp.rebuildPolygonFromPlanes();
 }
 
 void CDemoTrace::processMyEvent(int code) {

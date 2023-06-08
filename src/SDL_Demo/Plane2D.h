@@ -33,6 +33,13 @@ public:
     Plane2D() : normal(Vec2D()), distance(0.0f) {}
     Plane2D(const Vec2D& newNorm, float distanceVal) : normal(newNorm), distance(distanceVal) {}
 
+	bool compare(const Plane2D &o, float epsD, float epsN) const {
+		if(abs(o.distance-this->distance)>epsD)
+			return false;
+		if(normal.compare(o.normal,epsN)==false)
+			return false;
+		return true;
+	}
     Vec2D projectPoint(const Vec2D& point) const {
         float t = -(normal.dot(point) + distance) /(normal.dot(normal));
         return point + normal * t;

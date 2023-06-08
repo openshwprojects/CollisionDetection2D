@@ -14,7 +14,9 @@ public:
 	void fromPoly(const class Vec2D &a, const Vec2D &b, const Vec2D&c, const Vec2D&d, bool bSort = false);
 	void fromPoly(const Array<Vec2D> &poly, bool bSort = false);
 	bool trace(class CTrace2D &tr) const;
+	bool hasPlane(const Plane2D &pl) const;
 	void addAxisAlignedPlanesFromBounds();
+	void rebuildPolygonFromPlanes();
 
 	const Polygon2D &getPoly() const {
 		return vertices;
