@@ -76,7 +76,22 @@ void CDemoContainer::onKeyEvent(int key, bool bDown) {
 					processMyEvent(s.eventIndex);
 				}
             }
-
+            if (s.keyU == key) {
+				if(s.pfloat) {
+					*s.pfloat += s.step;
+					if(*s.pfloat > s.max){
+						*s.pfloat = s.max;
+					}
+				}
+            }
+            if (s.keyD == key) {
+				if(s.pfloat) {
+					*s.pfloat -= s.step;
+					if(*s.pfloat < s.min){
+						*s.pfloat = s.min;
+					}
+				}
+            }
         }
     }
     demos[current]->onKeyEvent(key, bDown);
@@ -127,8 +142,8 @@ void CDemoContainer::addSetting(float *value, float step, float min, float max, 
     set.max = max;
     set.boolean = 0;
 	set.eventIndex = 0;
-    set.key = keyU;
-    set.key = keyD;
+    set.keyU = keyU;
+    set.keyD = keyD;
     set.name = name;
     settings.push_back(set);
 }

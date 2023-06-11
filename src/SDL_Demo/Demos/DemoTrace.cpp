@@ -75,6 +75,7 @@ void CDemoTrace::runFrame() {
 			Vec2D perp = tr.getPerp().getNormalized() * tr.getRadius();
 			r->drawLine(tr.getStart()+perp,tr.getHit()+perp);
 			r->drawLine(tr.getStart()-perp,tr.getHit()-perp);
+			r->drawCircle(tr.getHit(),tr.getRadius());
 		}
 	} else {
 		r->setColor(0,255,0);

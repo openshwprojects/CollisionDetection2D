@@ -171,6 +171,15 @@ public:
         float nY = this->x * sine + this->y * cosine;
 		this->set(nX,nY);
 	}
+	void fromRadians(float angle, float len){
+        float cosine = cos(angle);
+        float sine = sin(angle);
+        this->x = len * cosine;
+        this->y = len * sine;
+	}
+	void fromDegs(float angle, float len){
+        fromRadians(DEG2RAD(angle),len);
+	}
 
     Vec2D& operator/=(float scalar) {
         if (scalar != 0.0f) {

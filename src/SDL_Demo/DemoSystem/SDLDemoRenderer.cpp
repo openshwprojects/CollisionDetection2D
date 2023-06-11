@@ -78,6 +78,16 @@ void SDLDemoRenderer::drawLine(const Vec2D &a, const Vec2D &b, int width) {
 		drawLine(a2,b2);
 	}
 }
+void SDLDemoRenderer::drawCircle(const class Vec2D &center, float radius) {
+	float step = 30.0f;
+	for(float a = 0; a < 360; a += step) {
+		float ab = a + step;
+		Vec2D da, db;
+		da.fromDegs(a,radius);
+		db.fromDegs(ab,radius);
+		drawLine(center+da, center+db);
+	}
+}
 void SDLDemoRenderer::drawLine(const Vec2D &a, const Vec2D &b) {
 	SDL_RenderDrawLineF(renderer, a.getX(),a.getY(),b.getX(),b.getY());
 }
