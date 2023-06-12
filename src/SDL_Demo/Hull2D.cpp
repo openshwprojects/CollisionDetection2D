@@ -41,6 +41,8 @@ bool Hull2D::trace(class CTrace2D &tr) const {
 		// extra axis aligned planes
 		if(tr.isSphere()) {
 			dist -= tr.getRadius();
+		} else if(tr.isBox()) {
+			dist += tr.getLowestCornerDot(pl.getNormal());
 		}
 		float ds = tr.getStart().dot(pl.getNormal()) + dist;
 		float de = tr.getEnd().dot(pl.getNormal()) + dist;

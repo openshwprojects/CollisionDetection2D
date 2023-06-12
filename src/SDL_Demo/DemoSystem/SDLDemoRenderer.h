@@ -22,6 +22,7 @@ public:
 	virtual void drawLine(const Vec2D &a, const Vec2D &b, int width);
 	virtual void drawLine(const Vec2D &a, const Vec2D &b);
 	virtual void drawCircle(const class Vec2D &a, float rad);
+	virtual void drawBox(const class BBox2D &box);
 	virtual bool processEvents();
 	virtual void shutdown();
 	virtual void beginFrame(byte r, byte g, byte b, byte a);

@@ -3,11 +3,13 @@
 
 #include <Vec2.h>
 #include <Plane2D.h>
+#include <BBox2D.h>
 
 enum ETraceType {
 	TT_NONE,
 	TT_POINT,
-	TT_SPHERE
+	TT_SPHERE,
+	TT_BOX
 };
 
 class CTrace2D {
@@ -18,11 +20,15 @@ friend class Hull2D;
 	Vec2D delta;
 	Vec2D dir;
 	Vec2D hit;
-	float radius;
 	float length;
 	float fraction;
 	Plane2D plane;
 	ETraceType type;
+	// for TT_SPHERE
+	float radius;
+	// for TT_BOX
+	BBox2D box;
+
 
 	void onFractionChanged() {
 		hit = start + delta * fraction;
@@ -37,11 +43,20 @@ friend class Hull2D;
 		this->fraction = 1.0f;
 	}
 public:
+	float getLowestCornerDot(const Vec2D &n) {
+		return box.getLowestCornerDot(n);
+	}
+	const BBox2D &getBox() const {
+		return box;
+	}
 	Vec2D getPerp() const {
 		return dir.getPerpendicular();
 	}
 	float getRadius() const {
 		return radius;
+	}
+	bool isBox() const {
+		return type == TT_BOX;
 	}
 	bool isSphere() const {
 		return type == TT_SPHERE;
@@ -57,6 +72,11 @@ public:
 		this->setup(a,b);
 		this->radius = r;
 		this->type = TT_SPHERE;
+	}
+	void setupBox(const Vec2D &a, const Vec2D &b, float w, float h) {
+		this->setup(a,b);
+		this->box.fromWidthHeight(w,h);
+		this->type = TT_BOX;
 	}
 	bool hasHit() const {
 		return fraction != 1.0f;

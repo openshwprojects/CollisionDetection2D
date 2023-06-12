@@ -14,6 +14,19 @@ public:
 		mins.set(inf,inf);
 		maxs.set(-inf,-inf);
 	}
+	void fromRadius(float r) {
+		mins = maxs = Vec2D(r,r);
+	}
+	void fromWidthHeight(float w, float h) {
+		mins.setX(-w*0.5f);
+		maxs.setX(w*0.5f);
+		mins.setY(-h * 0.5f);
+		maxs.setY(h * 0.5f);
+	}
+	void translate(const Vec2D &p) {
+		maxs += p;
+		mins += p;
+	}
 	bool isInside(const Vec2D &p) const {
 		return p.getX() >= mins.getX() && p.getX() <= maxs.getX() &&
 			   p.getY() >= mins.getY() && p.getY() <= maxs.getY();

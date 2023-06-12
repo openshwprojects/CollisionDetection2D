@@ -26,7 +26,7 @@ void CDemoTrace::onDemoInit() {
 void CDemoTrace::processMyEvent(int code) {
 	if(code == 101) {
 		curType++;
-		if(curType > TT_SPHERE)
+		if(curType > TT_BOX)
 			curType = TT_POINT;
 	}
 }
@@ -55,6 +55,8 @@ void CDemoTrace::runFrame() {
     container->drawDebugTexts();
 	if(curType == TT_POINT) {
 		container->drawDebugText("Current trace type: ray");
+	} else if(curType == TT_BOX) {
+		container->drawDebugText("Current trace type: box");
 	} else {
 		container->drawDebugText("Current trace type: circle");
 	}
@@ -64,6 +66,8 @@ void CDemoTrace::runFrame() {
 	}
 	if(curType == TT_POINT) {
 		tr.setupRay(pointA,pointB);
+	} if(curType == TT_BOX) {
+		tr.setupBox(pointA,pointB,traceRadius,traceRadius*2);
 	} else {
 		tr.setupSphere(pointA,pointB,traceRadius);
 	}
@@ -76,6 +80,10 @@ void CDemoTrace::runFrame() {
 			r->drawLine(tr.getStart()+perp,tr.getHit()+perp);
 			r->drawLine(tr.getStart()-perp,tr.getHit()-perp);
 			r->drawCircle(tr.getHit(),tr.getRadius());
+		} else if(tr.isBox()) {
+			BBox2D box = tr.getBox();
+			box.translate(tr.getHit());
+			r->drawBox(box);
 		}
 	} else {
 		r->setColor(0,255,0);
@@ -84,6 +92,10 @@ void CDemoTrace::runFrame() {
 			Vec2D perp = tr.getPerp().getNormalized() * tr.getRadius();
 			r->drawLine(tr.getStart()+perp,tr.getEnd()+perp);
 			r->drawLine(tr.getStart()-perp,tr.getEnd()-perp);
+		} else if(tr.isBox()) {
+			BBox2D box = tr.getBox();
+			box.translate(tr.getEnd());
+			r->drawBox(box);
 		}
 	}
 	r->drawText(pointA.getX(),pointA.getY(),"A",0,0,0);

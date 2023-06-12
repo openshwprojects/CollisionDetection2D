@@ -1,5 +1,6 @@
 #include <DemoSystem/SDLDemoRenderer.h>
 #include <Vec2.h>
+#include <BBox2D.h>
 #include <DemoSystem/IBaseDemo.h>
 
 #define SDL_MAIN_HANDLED
@@ -76,6 +77,12 @@ void SDLDemoRenderer::drawLine(const Vec2D &a, const Vec2D &b, int width) {
 		Vec2D a2 = a + v * i;
 		Vec2D b2 = b + v * i;
 		drawLine(a2,b2);
+	}
+}
+void SDLDemoRenderer::drawBox(const class BBox2D &box) {
+	for(int i = 0; i < 4; i++) {
+		int ni = (i+1)%4;	
+		drawLine(box.getCorner(i), box.getCorner(ni));
 	}
 }
 void SDLDemoRenderer::drawCircle(const class Vec2D &center, float radius) {
