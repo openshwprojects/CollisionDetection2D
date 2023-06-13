@@ -86,16 +86,30 @@ void CDemoTrace::runFrame() {
 			r->drawBox(box);
 		}
 	} else {
-		r->setColor(0,255,0);
-		r->drawLine(tr.getStart(),tr.getEnd());
-		if(tr.isSphere()) {
-			Vec2D perp = tr.getPerp().getNormalized() * tr.getRadius();
-			r->drawLine(tr.getStart()+perp,tr.getEnd()+perp);
-			r->drawLine(tr.getStart()-perp,tr.getEnd()-perp);
-		} else if(tr.isBox()) {
-			BBox2D box = tr.getBox();
-			box.translate(tr.getEnd());
-			r->drawBox(box);
+		if(tr.isStartSolid()) {			
+			r->setColor(255,255,0);
+			r->drawLine(tr.getStart(),tr.getEnd());
+			if(tr.isSphere()) {
+				Vec2D perp = tr.getPerp().getNormalized() * tr.getRadius();
+				r->drawLine(tr.getStart()+perp,tr.getEnd()+perp);
+				r->drawLine(tr.getStart()-perp,tr.getEnd()-perp);
+			} else if(tr.isBox()) {
+				BBox2D box = tr.getBox();
+				box.translate(tr.getStart());
+				r->drawBox(box);
+			}
+		} else {
+			r->setColor(0,255,0);
+			r->drawLine(tr.getStart(),tr.getEnd());
+			if(tr.isSphere()) {
+				Vec2D perp = tr.getPerp().getNormalized() * tr.getRadius();
+				r->drawLine(tr.getStart()+perp,tr.getEnd()+perp);
+				r->drawLine(tr.getStart()-perp,tr.getEnd()-perp);
+			} else if(tr.isBox()) {
+				BBox2D box = tr.getBox();
+				box.translate(tr.getEnd());
+				r->drawBox(box);
+			}
 		}
 	}
 	r->drawText(pointA.getX(),pointA.getY(),"A",0,0,0);

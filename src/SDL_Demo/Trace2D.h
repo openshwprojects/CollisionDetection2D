@@ -49,6 +49,9 @@ public:
 	const BBox2D &getBox() const {
 		return box;
 	}
+	bool isStartSolid() const {
+		return this->bStartSolid;
+	}
 	Vec2D getPerp() const {
 		return dir.getPerpendicular();
 	}
@@ -67,6 +70,7 @@ public:
 	void setupRay(const Vec2D &a, const Vec2D &b) {
 		this->setup(a,b);
 		this->type = TT_POINT;
+		this->radius = 0;
 	}
 	void setupSphere(const Vec2D &a, const Vec2D &b, float r) {
 		this->setup(a,b);
@@ -76,6 +80,7 @@ public:
 	void setupBox(const Vec2D &a, const Vec2D &b, float w, float h) {
 		this->setup(a,b);
 		this->box.fromWidthHeight(w,h);
+	//	this->radius = this->box.getRadius();
 		this->type = TT_BOX;
 	}
 	bool hasHit() const {
