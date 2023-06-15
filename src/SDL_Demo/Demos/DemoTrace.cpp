@@ -66,7 +66,7 @@ void CDemoTrace::runFrame() {
 	}
 	if(curType == TT_POINT) {
 		tr.setupRay(pointA,pointB);
-	} if(curType == TT_BOX) {
+	} else if(curType == TT_BOX) {
 		tr.setupBox(pointA,pointB,traceRadius,traceRadius*2);
 	} else {
 		tr.setupSphere(pointA,pointB,traceRadius);
