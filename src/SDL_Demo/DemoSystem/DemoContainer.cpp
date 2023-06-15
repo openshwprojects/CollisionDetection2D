@@ -22,6 +22,7 @@ void CDemoContainer::scrollDemos(int ofs) {
 	initDemo();
 }
 void CDemoContainer::initDemo() {
+    nextSettingsKey = 0;
 	settings.clear();
 	addSetting(MY_EVENT_NEXT_DEMO,"",'q');
 	addSetting(MY_EVENT_PREV_DEMO,"",'w');
