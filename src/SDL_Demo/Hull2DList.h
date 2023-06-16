@@ -37,5 +37,6 @@ public:
 		return hulls[i];
 	}
 	bool trace(class CTrace2D &tr) const;
+	int findByPoint(const Vec2D &p) const;
 };
 #endif // __HULL2D_LIST_H__

@@ -15,8 +15,10 @@ public:
 	void fromPoly(const Array<Vec2D> &poly, bool bSort = false);
 	bool trace(class CTrace2D &tr) const;
 	bool hasPlane(const Plane2D &pl) const;
+	bool isInside(const class Vec2D &p) const;
 	void addAxisAlignedPlanesFromBounds();
 	void rebuildPolygonFromPlanes();
+	void translate(const class Vec2D &p);
 
 	const Polygon2D &getPoly() const {
 		return vertices;

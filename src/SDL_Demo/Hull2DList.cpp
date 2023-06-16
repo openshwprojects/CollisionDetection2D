@@ -7,3 +7,12 @@ bool Hull2DList::trace(class CTrace2D &tr) const {
 	}
 	return tr.hasHit();
 }
+
+int Hull2DList::findByPoint(const Vec2D &p) const {
+	for(int i = 0; i < size(); i++) {
+		if(hulls[i].isInside(p)) {
+			return i;
+		}
+	}
+	return -1;
+}

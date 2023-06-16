@@ -256,6 +256,14 @@
 			Name="Demos"
 			>
 			<File
+				RelativePath=".\Demos\DemoCollision.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\DemoCollision.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Demos\DemoSortVertices.cpp"
 				>
 			</File>

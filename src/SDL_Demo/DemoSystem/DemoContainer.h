@@ -45,6 +45,7 @@ public:
     virtual const char* getName() const;
     virtual void setRenderer(IDemoRenderer* ren);
     virtual void onMouseEvent(int x, int y, int button, bool bDown);
+	virtual void onMouseMoveEvent(int x, int y, int dX, int dY);
     virtual bool onQuit() override;
     virtual void runFrame() override;
 };

@@ -78,6 +78,11 @@ void Polygon2D::calcBounds(class BBox2D &bb) const {
 		bb.addPoint(points[i]);
 	}
 }
+void Polygon2D::translate(const class Vec2D &p) {
+	for(int i = 0; i < points.size(); i++){
+		points[i] += p;
+	}
+}
 void Polygon2D::addToBB(class BBox2D &bb) const {
 	for(int i = 0; i < points.size(); i++){
 		bb.addPoint(points[i]);

@@ -22,6 +22,11 @@ public:
 		}
 		return true;
 	}
+	void translate(const class Vec2D &p) {
+		for(int i = 0; i < planes.size(); i++) {
+			planes[i].translate(p);
+		}
+	}
 	void addPlane(const Plane2D &p) {
 		planes.push_back(p);
 	}

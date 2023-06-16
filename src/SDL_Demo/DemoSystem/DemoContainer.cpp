@@ -1,6 +1,7 @@
 #include "DemoContainer.h"
 #include <Demos/DemoSortVertices.h>
 #include <Demos/DemoTrace.h>
+#include <Demos/DemoCollision.h>
 #include "IDemoRenderer.h"
 #include <stdarg.h>
 
@@ -15,6 +16,7 @@ CDemoContainer::CDemoContainer() {
     current = 0;
     addDemo(new CDemoSortVertices());
     addDemo(new CDemoTrace());
+    addDemo(new CDemoCollision());
 }
 
 void CDemoContainer::scrollDemos(int ofs) {
@@ -176,6 +178,9 @@ void CDemoContainer::setRenderer(IDemoRenderer* ren) {
 
 void CDemoContainer::onMouseEvent(int x, int y, int button, bool bDown) {
     demos[current]->onMouseEvent(x, y, button, bDown);
+}
+void CDemoContainer::onMouseMoveEvent(int x, int y, int dX, int dY) {
+    demos[current]->onMouseMoveEvent(x, y, dX, dY);
 }
 
 

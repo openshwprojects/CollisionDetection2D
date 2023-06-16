@@ -28,3 +28,7 @@ void CBaseDemo::drawPoly(const Polygon2D& p, byte r, byte g, byte b, byte a) {
 void CBaseDemo::onKeyEvent(int key, bool bDown) {
     // Implementation for handling key events
 }
+void CBaseDemo::onMouseMoveEvent(int x, int y, int dX, int dY) {
+
+}
+

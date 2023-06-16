@@ -33,6 +33,10 @@ public:
     Plane2D() : normal(Vec2D()), distance(0.0f) {}
     Plane2D(const Vec2D& newNorm, float distanceVal) : normal(newNorm), distance(distanceVal) {}
 
+	void translate(const Vec2D &ofs) {
+		float d = normal.dot(ofs);
+		distance += d;
+	}
 	bool compare(const Plane2D &o, float epsD, float epsN) const {
 		if(abs(o.distance-this->distance)>epsD)
 			return false;

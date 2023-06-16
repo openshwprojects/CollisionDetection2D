@@ -15,6 +15,7 @@ public:
     virtual const char* getName() const;
     void drawPoly(const Polygon2D& p, byte r, byte g, byte b, byte a = 255);
     virtual void onKeyEvent(int key, bool bDown);
+	virtual void onMouseMoveEvent(int x, int y, int dX, int dY);
 };
 
 #endif  // CBASE_DEMO_H

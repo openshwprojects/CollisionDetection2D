@@ -114,7 +114,10 @@ bool SDLDemoRenderer::processEvents() {
 			demo->onKeyEvent(event.key.keysym.sym, true);
 		} else if(event.type == SDL_KEYUP) {
 			demo->onKeyEvent(event.key.keysym.sym, false);
+		} else if (event.type == SDL_MOUSEMOTION) {
+            demo->onMouseMoveEvent(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
 		}
+ 
     }
 	return false;
 }

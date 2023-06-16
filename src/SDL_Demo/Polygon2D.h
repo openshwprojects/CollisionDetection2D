@@ -45,6 +45,7 @@ public:
 	void fromPlanes(const class PlaneSet2D &planes);
 	void addToBB(class BBox2D &bb) const;
 	void calcBounds(class BBox2D &bb) const;
+	void translate(const class Vec2D &p);
 };
 
 #endif // __POLYGON2D_H__

@@ -25,6 +25,20 @@ void Hull2D::fromPoly(const Array<Vec2D> &poly, bool bSort) {
 	planes.fromPoly(poly,bSort);
 	rebuildPolygonFromPlanes();
 }
+void Hull2D::translate(const class Vec2D &p) {
+	planes.translate(p);
+	vertices.translate(p);
+	bb.translate(p);
+}
+bool Hull2D::isInside(const class Vec2D &p) const {
+	for(int i = 0; i < 4; i++) {
+		Plane2D pl = bb.getPlane(i);
+		float d = pl.distanceTo(p);
+		if(d > 0)
+			return false;
+	}
+	return true;
+}
 bool Hull2D::trace(class CTrace2D &tr) const {
 	bool bHit = false;
 	float eps = 0.001f;
