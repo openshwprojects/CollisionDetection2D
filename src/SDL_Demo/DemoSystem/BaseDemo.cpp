@@ -19,10 +19,14 @@ const char* CBaseDemo::getName() const {
 
 void CBaseDemo::drawPoly(const Polygon2D& p, byte r, byte g, byte b, byte a) {
     this->r->setColor(r, g, b);
-    for (int i = 0; i < p.size(); i++) {
-        int n = (i + 1) % p.size();
-        this->r->drawLine(p[i], p[n]);
-    }
+	if(true) {
+		for (int i = 0; i < p.size(); i++) {
+			int n = (i + 1) % p.size();
+			this->r->drawLine(p[i], p[n]);
+		}
+	} else {
+		this->r->fillPoly(p);
+	}
 }
 
 void CBaseDemo::onKeyEvent(int key, bool bDown) {

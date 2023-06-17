@@ -1,6 +1,7 @@
 #include <DemoSystem/SDLDemoRenderer.h>
 #include <Vec2.h>
 #include <BBox2D.h>
+#include <Polygon2D.h>
 #include <DemoSystem/IBaseDemo.h>
 
 #define SDL_MAIN_HANDLED
@@ -78,6 +79,16 @@ void SDLDemoRenderer::drawLine(const Vec2D &a, const Vec2D &b, int width) {
 		Vec2D b2 = b + v * i;
 		drawLine(a2,b2);
 	}
+}
+void SDLDemoRenderer::fillPoly(const class Polygon2D& p) {
+	SDL_Point *pts = (SDL_Point *)alloca(p.size()*sizeof(SDL_Point));
+	for(int i = 0; i < p.size(); i++) {
+		SDL_Point &tg = pts[i];
+		const Vec2D &s = p[i];
+		tg.x = s.getX();
+		tg.y = s.getY();
+	}
+	// TODO - fill poly
 }
 void SDLDemoRenderer::drawBox(const class BBox2D &box) {
 	for(int i = 0; i < 4; i++) {

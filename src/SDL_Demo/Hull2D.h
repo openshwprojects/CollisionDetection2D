@@ -26,6 +26,9 @@ public:
 	const PlaneSet2D &getPlanes() const {
 		return planes;
 	}
+	const BBox2D &getBB() const {
+		return bb;
+	}
 };
 
 #endif // __HULL2D_H__

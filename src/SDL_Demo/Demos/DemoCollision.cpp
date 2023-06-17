@@ -60,7 +60,21 @@ void CDemoCollision::runFrame() {
 
 	for(int i = 0; i < hulls.size(); i++) {
 		const Hull2D &h = hulls[i];
-		this->drawPoly(h.getPoly(),100,0,0);
+		bool bHasCollision = false;
+		for(int j = 0; j < hulls.size(); j++) {
+			const Hull2D &hi = hulls[j];
+			if(i == j) {
+				continue;
+			}
+			if(hi.getBB().intersectsBox(h.getBB())){
+				bHasCollision = true;
+			}
+		}
+		if(bHasCollision) {
+			this->drawPoly(h.getPoly(),250,0,0);
+		} else {
+			this->drawPoly(h.getPoly(),0,250,0);
+		}
 	}
 
     r->endFrame();
