@@ -12,6 +12,8 @@ public:
 	virtual void beginFrame(byte r, byte g, byte b, byte a = 255) = 0;
 	virtual int drawText(int x, int y, const char *s, byte r, byte g, byte b) = 0;
 	virtual void endFrame() = 0;
+	// TODO: split into another interface
+	virtual bool isMouseButtonDown(int button) = 0;
 };
 
 #endif // __IDEMORENDERER_H__

@@ -6,17 +6,20 @@
 
 typedef struct _TTF_Font TTF_Font;
 
+#define MAX_MOUSE_BUTTONS		10
+
 class SDLDemoRenderer : public IDemoRenderer {
 	struct SDL_Renderer* renderer;
     struct SDL_Window* window;
 	class IBaseDemo *demo ;
 	int running;
 	TTF_Font* font;
+	bool mouseButtonState[MAX_MOUSE_BUTTONS];
 public:
 	SDLDemoRenderer();
-	void drawText();
 	void setDemo(IBaseDemo *demo);
 	void createWindow();
+	virtual bool isMouseButtonDown(int button);
 	virtual int drawText(int x, int y, const char *s, byte r, byte g, byte b);
 	virtual void setColor(byte r, byte g, byte b, byte a = 255) ;
 	virtual void drawLine(const Vec2D &a, const Vec2D &b, int width);

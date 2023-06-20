@@ -15,9 +15,9 @@
 
 SDLDemoRenderer::SDLDemoRenderer() {
 	font = 0;
-}
-void SDLDemoRenderer::drawText() {
-
+	for(int i = 0; i < MAX_MOUSE_BUTTONS; i++) {
+		mouseButtonState[i] = false;
+	}
 }
 void SDLDemoRenderer::setDemo(IBaseDemo *demo) {
 	this->demo = demo;
@@ -42,6 +42,9 @@ void SDLDemoRenderer::createWindow() {
 		printf("Font load failed\n");
 	}
 
+}
+bool SDLDemoRenderer::isMouseButtonDown(int button) {
+	return mouseButtonState[button];
 }
 int SDLDemoRenderer::drawText(int x, int y, const char *s, byte r, byte g, byte b) {
 
@@ -118,8 +121,10 @@ bool SDLDemoRenderer::processEvents() {
 				return true;
 			}
 		} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+			mouseButtonState[event.button.button] = true;
 			demo->onMouseEvent(event.button.x,event.button.y,event.button.button, true);
 		} else if (event.type == SDL_MOUSEBUTTONUP) {
+			mouseButtonState[event.button.button] = false;
 			demo->onMouseEvent(event.button.x,event.button.y,event.button.button, false);
 		} else if(event.type == SDL_KEYDOWN) {
 			demo->onKeyEvent(event.key.keysym.sym, true);
