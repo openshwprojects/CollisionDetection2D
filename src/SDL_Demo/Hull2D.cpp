@@ -25,6 +25,19 @@ void Hull2D::fromPoly(const Array<Vec2D> &poly, bool bSort) {
 	planes.fromPoly(poly,bSort);
 	rebuildPolygonFromPlanes();
 }
+void Hull2D::rotateAroundRadians(const class Vec2D &center, float angle) {
+#if 1
+	planes.rotateAroundRadians(center,angle);
+	rebuildPolygonFromPlanes();
+#else
+	vertices.rotateAroundRadians(center,angle);
+	rebuildPlanesFromPolygons();
+#endif
+}
+void Hull2D::rotateCenterRadians(float angle) {
+	Vec2D center = bb.getCenter();
+	rotateAroundRadians(center,angle);
+}
 void Hull2D::translate(const class Vec2D &p) {
 	planes.translate(p);
 	vertices.translate(p);

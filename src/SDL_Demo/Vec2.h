@@ -134,6 +134,9 @@ public:
     Vec2D operator-(const Vec2D& other) const {
         return Vec2D(x - other.x, y - other.y);
     }
+    Vec2D operator-() const {
+        return Vec2D(- x, -y);
+    }
 
     Vec2D operator*(float scalar) const {
         return Vec2D(x * scalar, y * scalar);

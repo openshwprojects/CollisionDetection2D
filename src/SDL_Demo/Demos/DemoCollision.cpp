@@ -41,8 +41,13 @@ void CDemoCollision::onMouseEvent(int x, int y, int button, bool bDown) {
 		} else {
 			draggingIndex = -1;
 		}
-	} else {
-
+	} else if(button == 3) {
+		if(bDown) {
+			int which  = hulls.findByPoint(Vec2D(x,y));
+			if(which!=-1) {
+				hulls[which].rotateCenterRadians(DEG2RAD(45.0f));
+			}
+		}
 	}
 }
 

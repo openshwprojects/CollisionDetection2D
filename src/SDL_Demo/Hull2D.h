@@ -19,6 +19,8 @@ public:
 	void addAxisAlignedPlanesFromBounds();
 	void rebuildPolygonFromPlanes();
 	void translate(const class Vec2D &p);
+	void rotateAroundRadians(const class Vec2D &center, float angle);
+	void rotateCenterRadians(float angle);
 
 	const Polygon2D &getPoly() const {
 		return vertices;
