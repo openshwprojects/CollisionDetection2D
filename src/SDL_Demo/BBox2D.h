@@ -66,7 +66,7 @@ public:
 		return Vec2D(maxs.getX() - mins.getX(), maxs.getY() - mins.getY());
 	}
 	Vec2D getCenter() const {
-		return Vec2D(maxs+maxs)*0.5f;
+		return Vec2D(maxs+mins)*0.5f;
 	}
 	float getSizeX() const {
 		return maxs.getX() - mins.getX();
