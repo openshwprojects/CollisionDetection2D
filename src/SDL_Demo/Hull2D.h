@@ -18,6 +18,7 @@ public:
 	bool isInside(const class Vec2D &p) const;
 	void addAxisAlignedPlanesFromBounds();
 	void rebuildPolygonFromPlanes();
+	void rebuildPlanesFromPolygons();
 	void translate(const class Vec2D &p);
 	void rotateAroundRadians(const class Vec2D &center, float angle);
 	void rotateCenterRadians(float angle);

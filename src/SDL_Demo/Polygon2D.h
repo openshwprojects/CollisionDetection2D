@@ -46,6 +46,7 @@ public:
 	void addToBB(class BBox2D &bb) const;
 	void calcBounds(class BBox2D &bb) const;
 	void translate(const class Vec2D &p);
+	void rotateAroundRadians(const class Vec2D &center, float angle);
 };
 
 #endif // __POLYGON2D_H__

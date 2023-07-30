@@ -9,6 +9,9 @@ void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort)
 	planes.fromPoly(a,b,c,bSort);
 	rebuildPolygonFromPlanes();
 }
+void Hull2D::rebuildPlanesFromPolygons() {
+
+}
 void Hull2D::rebuildPolygonFromPlanes() {
 	vertices.fromPlanes(planes);
 	vertices.calcBounds(bb);
@@ -26,7 +29,7 @@ void Hull2D::fromPoly(const Array<Vec2D> &poly, bool bSort) {
 	rebuildPolygonFromPlanes();
 }
 void Hull2D::rotateAroundRadians(const class Vec2D &center, float angle) {
-#if 1
+#if 0
 	planes.rotateAroundRadians(center,angle);
 	rebuildPolygonFromPlanes();
 #else

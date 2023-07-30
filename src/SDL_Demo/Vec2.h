@@ -174,6 +174,11 @@ public:
         float nY = this->x * sine + this->y * cosine;
 		this->set(nX,nY);
 	}
+	void rotateAroundRadians(const Vec2D &p, float angle){
+		*this -= p;
+		rotateRadians(angle);
+		*this += p;
+	}
 	void fromRadians(float angle, float len){
         float cosine = cos(angle);
         float sine = sin(angle);

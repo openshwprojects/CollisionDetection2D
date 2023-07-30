@@ -78,6 +78,11 @@ void Polygon2D::calcBounds(class BBox2D &bb) const {
 		bb.addPoint(points[i]);
 	}
 }
+void Polygon2D::rotateAroundRadians(const class Vec2D &center, float angle) {
+	for(int i = 0; i < points.size(); i++){
+		points[i].rotateAroundRadians(center,angle);
+	}
+}
 void Polygon2D::translate(const class Vec2D &p) {
 	for(int i = 0; i < points.size(); i++){
 		points[i] += p;
