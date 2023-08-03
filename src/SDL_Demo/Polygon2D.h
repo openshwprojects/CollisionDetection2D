@@ -21,6 +21,9 @@ public:
 	Vec2D &operator[](int idx) {
 		return points[idx];
 	}
+    operator const Array<Vec2D>&() const {
+        return points;
+    }
 	bool hasVertex(const Vec2D &v, float margin) const {
 		for(int i = 0; i < points.size(); i++){
 			if(points[i].isWithin(v,margin))

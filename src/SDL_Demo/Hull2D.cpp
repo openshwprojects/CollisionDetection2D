@@ -10,7 +10,8 @@ void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort)
 	rebuildPolygonFromPlanes();
 }
 void Hull2D::rebuildPlanesFromPolygons() {
-
+	planes.fromPoly(vertices);
+	vertices.calcBounds(bb);
 }
 void Hull2D::rebuildPolygonFromPlanes() {
 	vertices.fromPlanes(planes);
