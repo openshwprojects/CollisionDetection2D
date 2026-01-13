@@ -1,12 +1,13 @@
 #include "Hull2D.h"
+
 #include "Trace2D.h"
 
-void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, const Vec2D&d, bool bSort) {
-	planes.fromPoly(a,b,c,d,bSort);
+void Hull2D::fromPoly(const Vec2D& a, const Vec2D& b, const Vec2D& c, const Vec2D& d, bool bSort) {
+	planes.fromPoly(a, b, c, d, bSort);
 	rebuildPolygonFromPlanes();
 }
-void Hull2D::fromPoly(const Vec2D &a, const Vec2D &b, const Vec2D&c, bool bSort) {
-	planes.fromPoly(a,b,c,bSort);
+void Hull2D::fromPoly(const Vec2D& a, const Vec2D& b, const Vec2D& c, bool bSort) {
+	planes.fromPoly(a, b, c, bSort);
 	rebuildPolygonFromPlanes();
 }
 void Hull2D::rebuildPlanesFromPolygons() {
@@ -18,69 +19,68 @@ void Hull2D::rebuildPolygonFromPlanes() {
 	vertices.calcBounds(bb);
 }
 void Hull2D::addAxisAlignedPlanesFromBounds() {
-	for(int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		Plane2D pl = bb.getPlane(i);
-		if(planes.hasPlane(pl)==false) {
+		if (planes.hasPlane(pl) == false) {
 			planes.addPlane(pl);
 		}
 	}
 }
-void Hull2D::fromPoly(const Array<Vec2D> &poly, bool bSort) {
-	planes.fromPoly(poly,bSort);
+void Hull2D::fromPoly(const Array<Vec2D>& poly, bool bSort) {
+	planes.fromPoly(poly, bSort);
 	rebuildPolygonFromPlanes();
 }
-void Hull2D::rotateAroundRadians(const class Vec2D &center, float angle) {
+void Hull2D::rotateAroundRadians(const class Vec2D& center, float angle) {
 #if 0
 	planes.rotateAroundRadians(center,angle);
 	rebuildPolygonFromPlanes();
 #else
-	vertices.rotateAroundRadians(center,angle);
+	vertices.rotateAroundRadians(center, angle);
 	rebuildPlanesFromPolygons();
 #endif
 }
 void Hull2D::rotateCenterRadians(float angle) {
 	Vec2D center = bb.getCenter();
-	rotateAroundRadians(center,angle);
+	rotateAroundRadians(center, angle);
 }
-void Hull2D::translate(const class Vec2D &p) {
+void Hull2D::translate(const class Vec2D& p) {
 	planes.translate(p);
 	vertices.translate(p);
 	bb.translate(p);
 }
-bool Hull2D::isInside(const class Vec2D &p) const {
-	for(int i = 0; i < 4; i++) {
+bool Hull2D::isInside(const class Vec2D& p) const {
+	for (int i = 0; i < 4; i++) {
 		Plane2D pl = bb.getPlane(i);
 		float d = pl.distanceTo(p);
-		if(d > 0)
-			return false;
+		if (d > 0) return false;
 	}
 	return true;
 }
-bool Hull2D::trace(class CTrace2D &tr) const {
+bool Hull2D::trace(class CTrace2D& tr) const {
 	bool bHit = false;
 	float eps = 0.001f;
 	bool bEndOut = false;
 	bool bStartOut = false;
 	float enterFrac = -1.0f;
 	float leaveFrac = 1.0f;
-	const Plane2D *bestPlane = 0;
+	const Plane2D* bestPlane = 0;
 
-	for(int i = 0; i < planes.size(); i++) {
-		const Plane2D &pl = planes[i];
+	for (int i = 0; i < planes.size(); i++) {
+		const Plane2D& pl = planes[i];
 		float dist = pl.getDistance();
 		// NOTE: this will work only if we have force-added
 		// extra axis aligned planes
-		if(tr.isSphere()) {
+		if (tr.isSphere()) {
 			dist -= tr.getRadius();
-		} else if(tr.isBox()) {
+		} else if (tr.isBox()) {
 			dist += tr.getLowestCornerDot(pl.getNormal());
 		}
 		float ds = tr.getStart().dot(pl.getNormal()) + dist;
 		float de = tr.getEnd().dot(pl.getNormal()) + dist;
-		if(de > 0) {
+		if (de > 0) {
 			bEndOut = true;
 		}
-		if(ds > 0) {
+		if (ds > 0) {
 			bStartOut = true;
 		}
 		if (ds > 0 && (de >= eps || de >= ds)) {
@@ -90,7 +90,7 @@ bool Hull2D::trace(class CTrace2D &tr) const {
 			continue;
 		}
 		if (ds > de) {
-			float f = (ds-eps) / (ds-de);
+			float f = (ds - eps) / (ds - de);
 			if (f < 0) {
 				f = 0;
 			}
@@ -99,7 +99,7 @@ bool Hull2D::trace(class CTrace2D &tr) const {
 				bestPlane = &pl;
 			}
 		} else {
-			float f = (ds+eps)/(ds-de);
+			float f = (ds + eps) / (ds - de);
 			if (f > 1) {
 				f = 1;
 			}
@@ -108,14 +108,19 @@ bool Hull2D::trace(class CTrace2D &tr) const {
 			}
 		}
 	}
+
 	if (!bStartOut) {
 		tr.bStartSolid = true;
+		if (leaveFrac > tr.exitFraction) {
+			tr.exitFraction = leaveFrac;
+		}
 		if (!bEndOut) {
 			tr.bAllSolid = true;
 			tr.fraction = 0;
 		}
 		return true;
 	}
+
 	if (enterFrac < leaveFrac) {
 		if (enterFrac > -1 && enterFrac < tr.fraction) {
 			if (enterFrac < 0) {
@@ -129,6 +134,3 @@ bool Hull2D::trace(class CTrace2D &tr) const {
 	}
 	return false;
 }
-
-
-

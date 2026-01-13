@@ -10,6 +10,9 @@ public:
 	int size() const {
 		return hulls.size();
 	}
+	void clear() {
+		hulls.clear();
+	}
 	Hull2D &addHull2D(const Hull2D &h) {
 		int ri = hulls.size();
 		hulls.push_back(h);
