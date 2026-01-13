@@ -7,13 +7,25 @@
 #include <DemoSystem/IDemoRenderer.h>
 #include <Trace2D.h>
 
-CDemoCollision::CDemoCollision() { draggingIndex = -1; }
+CDemoCollision::CDemoCollision() {
+	draggingIndex = -1;
+}
 
 void CDemoCollision::onDemoInit() {
 	hulls.clear();
 	hulls.addPoly(Vec2D(200, 100), Vec2D(500, 100), Vec2D(500, 50), Vec2D(200, 50), true);
 	hulls.addPoly(Vec2D(200, 200), Vec2D(300, 200), Vec2D(300, 100), Vec2D(200, 100), true);
-	Hull2D& lp = hulls.addPoly(Vec2D(200, 200), Vec2D(300, 200), Vec2D(250, 300), true);
+	hulls.addPoly(Vec2D(200, 200), Vec2D(300, 200), Vec2D(250, 300), true);
+
+	// New shapes
+	// Vertical wall on the right
+	hulls.addPoly(Vec2D(600, 50), Vec2D(650, 50), Vec2D(650, 350), Vec2D(600, 350), true);
+
+	// Triangle obstacle on the left
+	hulls.addPoly(Vec2D(50, 250), Vec2D(150, 350), Vec2D(50, 350), true);
+
+	// Angled box in the middle-bottom
+	hulls.addPoly(Vec2D(400, 300), Vec2D(500, 250), Vec2D(550, 350), Vec2D(450, 400), true);
 }
 
 void CDemoCollision::processMyEvent(int code) {
@@ -23,7 +35,9 @@ void CDemoCollision::processMyEvent(int code) {
 	//		curType = TT_POINT;
 	// }
 }
-const char* CDemoCollision::getName() const { return "Simple collision"; }
+const char* CDemoCollision::getName() const {
+	return "Simple collision";
+}
 
 void CDemoCollision::onMouseMoveEvent(int x, int y, int dX, int dY) {
 	if (draggingIndex != -1) {
@@ -48,7 +62,9 @@ void CDemoCollision::onMouseEvent(int x, int y, int button, bool bDown) {
 	}
 }
 
-bool CDemoCollision::onQuit() { return true; }
+bool CDemoCollision::onQuit() {
+	return true;
+}
 
 void CDemoCollision::runFrame() {
 	CTrace2D tr;
@@ -68,7 +84,9 @@ void CDemoCollision::runFrame() {
 				continue;
 			}
 			if (hi.getBB().intersectsBox(h.getBB())) {
-				bHasCollision = true;
+				if (h.intersectsSAT(hi)) {
+					bHasCollision = true;
+				}
 			}
 		}
 		if (bHasCollision) {

@@ -56,6 +56,39 @@ bool Hull2D::isInside(const class Vec2D& p) const {
 	}
 	return true;
 }
+bool Hull2D::intersectsSAT(const Hull2D& other) const {
+	// Check planes of this hull
+	for (int i = 0; i < planes.size(); i++) {
+		const Plane2D& pl = planes[i];
+		bool allOutside = true;
+		const Polygon2D& otherPoly = other.getPoly();
+		for (int v = 0; v < otherPoly.size(); v++) {
+			if (pl.distanceTo(otherPoly[v]) <= 0) {
+				allOutside = false;
+				break;
+			}
+		}
+		if (allOutside) return false;
+	}
+
+	// Check planes of other hull
+	const PlaneSet2D& otherPlanes = other.getPlanes();
+	for (int i = 0; i < otherPlanes.size(); i++) {
+		const Plane2D& pl = otherPlanes[i];
+		bool allOutside = true;
+		const Polygon2D& myPoly = vertices;
+		for (int v = 0; v < myPoly.size(); v++) {
+			if (pl.distanceTo(myPoly[v]) <= 0) {
+				allOutside = false;
+				break;
+			}
+		}
+		if (allOutside) return false;
+	}
+
+	return true;
+}
+
 bool Hull2D::trace(class CTrace2D& tr) const {
 	bool bHit = false;
 	float eps = 0.001f;
