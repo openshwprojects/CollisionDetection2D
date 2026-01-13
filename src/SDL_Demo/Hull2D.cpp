@@ -89,6 +89,15 @@ bool Hull2D::intersectsSAT(const Hull2D& other) const {
 	return true;
 }
 
+bool Hull2D::intersects(const Shape2D* other) const {
+	if (other->getType() == ST_HULL) {
+		return intersectsSAT(*static_cast<const Hull2D*>(other));
+	} else if (other->getType() == ST_CIRCLE) {
+		return other->intersects(this);
+	}
+	return false;
+}
+
 bool Hull2D::trace(class CTrace2D& tr) const {
 	bool bHit = false;
 	float eps = 0.001f;

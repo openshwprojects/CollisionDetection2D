@@ -32,6 +32,11 @@ void CDemoTrace::onDemoInit() {
 
 	// Angled box in the middle-bottom
 	hulls.addPoly(Vec2D(400, 300), Vec2D(500, 250), Vec2D(550, 350), Vec2D(450, 400), true);
+
+	// Sample Circle
+	hulls.addCircle(Vec2D(100, 450), 40.0f);
+	// Second Circle (Larger)
+	hulls.addCircle(Vec2D(300, 450), 60.0f);
 }
 
 void CDemoTrace::processMyEvent(int code) {
@@ -73,8 +78,14 @@ void CDemoTrace::runFrame() {
 		container->drawDebugText("Current trace type: circle");
 	}
 	for (int i = 0; i < hulls.size(); i++) {
-		const Hull2D& h = hulls[i];
-		this->drawPoly(h.getPoly(), 100, 0, 0);
+		Shape2D* s = hulls[i];
+		if (s->getType() == ST_HULL) {
+			this->drawPoly(static_cast<Hull2D*>(s)->getPoly(), 100, 0, 0);
+		} else if (s->getType() == ST_CIRCLE) {
+			Circle2D* c = static_cast<Circle2D*>(s);
+			r->setColor(100, 0, 0);
+			r->drawCircle(c->getCenter(), c->getRadius());
+		}
 	}
 	if (curType == TT_POINT) {
 		tr.setupRay(pointA, pointB);

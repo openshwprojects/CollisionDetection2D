@@ -1,8 +1,8 @@
-#include <DemoSystem/SDLDemoRenderer.h>
-#include <Vec2.h>
 #include <BBox2D.h>
-#include <Polygon2D.h>
 #include <DemoSystem/IBaseDemo.h>
+#include <DemoSystem/SDLDemoRenderer.h>
+#include <Polygon2D.h>
+#include <Vec2.h>
 
 #define SDL_MAIN_HANDLED
 
@@ -15,11 +15,11 @@
 
 SDLDemoRenderer::SDLDemoRenderer() {
 	font = 0;
-	for(int i = 0; i < MAX_MOUSE_BUTTONS; i++) {
+	for (int i = 0; i < MAX_MOUSE_BUTTONS; i++) {
 		mouseButtonState[i] = false;
 	}
 }
-void SDLDemoRenderer::setDemo(IBaseDemo *demo) {
+void SDLDemoRenderer::setDemo(IBaseDemo* demo) {
 	this->demo = demo;
 }
 void SDLDemoRenderer::createWindow() {
@@ -27,36 +27,35 @@ void SDLDemoRenderer::createWindow() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	// Create a window
-	window = SDL_CreateWindow("SDL Rectangle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("SDL Rectangle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+							  800, 600, SDL_WINDOW_SHOWN);
 
 	// Create a renderer
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	///SDL_RenderSetScale(renderer,3,3);
+	/// SDL_RenderSetScale(renderer,3,3);
 
-	if ( TTF_Init() < 0 ) {
+	if (TTF_Init() < 0) {
 		printf("TTF_Init failed\n");
 	}
 	// Load font
 	font = TTF_OpenFont("fonts/open-sans/OpenSans-Regular.ttf", 15);
-	if ( !font ) {
+	if (!font) {
 		printf("Font load failed\n");
 	}
-
 }
 bool SDLDemoRenderer::isMouseButtonDown(int button) {
 	return mouseButtonState[button];
 }
-int SDLDemoRenderer::drawText(int x, int y, const char *s, byte r, byte g, byte b) {
-
+int SDLDemoRenderer::drawText(int x, int y, const char* s, byte r, byte g, byte b) {
 	SDL_Rect dest;
-	SDL_Color foreground = { r, g, b };
+	SDL_Color foreground = {r, g, b};
 
 	SDL_Surface* text_surf = TTF_RenderText_Solid(font, s, foreground);
-	if(text_surf == 0) {
+	if (text_surf == 0) {
 		return y;
 	}
-	SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, text_surf);
-	if(text == 0) {
+	SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_surf);
+	if (text == 0) {
 		SDL_FreeSurface(text_surf);
 		return y;
 	}
@@ -71,70 +70,70 @@ int SDLDemoRenderer::drawText(int x, int y, const char *s, byte r, byte g, byte 
 	return y + dest.h;
 }
 void SDLDemoRenderer::setColor(byte r, byte g, byte b, byte a) {
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
-void SDLDemoRenderer::drawLine(const Vec2D &a, const Vec2D &b, int width) {
-	Vec2D v = (a-b);
+void SDLDemoRenderer::drawLine(const Vec2D& a, const Vec2D& b, int width) {
+	Vec2D v = (a - b);
 	v.normalize();
 	v = v.getPerpendicular();
-	for(float i = -width; i < width; i+=1.0f) {
+	for (float i = -width; i < width; i += 1.0f) {
 		Vec2D a2 = a + v * i;
 		Vec2D b2 = b + v * i;
-		drawLine(a2,b2);
+		drawLine(a2, b2);
 	}
 }
 void SDLDemoRenderer::fillPoly(const class Polygon2D& p) {
-	SDL_Point *pts = (SDL_Point *)alloca(p.size()*sizeof(SDL_Point));
-	for(int i = 0; i < p.size(); i++) {
-		SDL_Point &tg = pts[i];
-		const Vec2D &s = p[i];
+	SDL_Point* pts = (SDL_Point*)alloca(p.size() * sizeof(SDL_Point));
+	for (int i = 0; i < p.size(); i++) {
+		SDL_Point& tg = pts[i];
+		const Vec2D& s = p[i];
 		tg.x = s.getX();
 		tg.y = s.getY();
 	}
 	// TODO - fill poly
 }
-void SDLDemoRenderer::drawBox(const class BBox2D &box) {
-	for(int i = 0; i < 4; i++) {
-		int ni = (i+1)%4;	
+void SDLDemoRenderer::drawBox(const class BBox2D& box) {
+	for (int i = 0; i < 4; i++) {
+		int ni = (i + 1) % 4;
 		drawLine(box.getCorner(i), box.getCorner(ni));
 	}
 }
-void SDLDemoRenderer::drawCircle(const class Vec2D &center, float radius) {
-	float step = 30.0f;
-	for(float a = 0; a < 360; a += step) {
+void SDLDemoRenderer::drawCircle(const class Vec2D& center, float radius) {
+	float step = 5.0f;
+	for (float a = 0; a < 360; a += step) {
 		float ab = a + step;
 		Vec2D da, db;
-		da.fromDegs(a,radius);
-		db.fromDegs(ab,radius);
-		drawLine(center+da, center+db);
+		da.fromDegs(a, radius);
+		db.fromDegs(ab, radius);
+		drawLine(center + da, center + db);
 	}
 }
-void SDLDemoRenderer::drawLine(const Vec2D &a, const Vec2D &b) {
-	SDL_RenderDrawLineF(renderer, a.getX(),a.getY(),b.getX(),b.getY());
+void SDLDemoRenderer::drawLine(const Vec2D& a, const Vec2D& b) {
+	SDL_RenderDrawLineF(renderer, a.getX(), a.getY(), b.getX(), b.getY());
 }
 bool SDLDemoRenderer::processEvents() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
-			if(demo->onQuit()) {
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT) {
+			if (demo->onQuit()) {
 				running = 0;
 				return true;
 			}
 		} else if (event.type == SDL_MOUSEBUTTONDOWN) {
 			mouseButtonState[event.button.button] = true;
-			demo->onMouseEvent(event.button.x,event.button.y,event.button.button, true);
+			demo->onMouseEvent(event.button.x, event.button.y, event.button.button, true);
 		} else if (event.type == SDL_MOUSEBUTTONUP) {
 			mouseButtonState[event.button.button] = false;
-			demo->onMouseEvent(event.button.x,event.button.y,event.button.button, false);
-		} else if(event.type == SDL_KEYDOWN) {
+			demo->onMouseEvent(event.button.x, event.button.y, event.button.button, false);
+		} else if (event.type == SDL_KEYDOWN) {
 			demo->onKeyEvent(event.key.keysym.sym, true);
-		} else if(event.type == SDL_KEYUP) {
+		} else if (event.type == SDL_KEYUP) {
 			demo->onKeyEvent(event.key.keysym.sym, false);
 		} else if (event.type == SDL_MOUSEMOTION) {
-            demo->onMouseMoveEvent(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+			demo->onMouseMoveEvent(event.motion.x, event.motion.y, event.motion.xrel,
+								   event.motion.yrel);
 		}
- 
-    }
+	}
 	return false;
 }
 void SDLDemoRenderer::shutdown() {
@@ -147,14 +146,12 @@ void SDLDemoRenderer::beginFrame(byte r, byte g, byte b, byte a) {
 	// Set the background color to green
 	SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-    // Clear the renderer with the background color
-    SDL_RenderClear(renderer);
-
+	// Clear the renderer with the background color
+	SDL_RenderClear(renderer);
 }
 void SDLDemoRenderer::endFrame() {
-    // Update the window
-    SDL_RenderPresent(renderer);
+	// Update the window
+	SDL_RenderPresent(renderer);
 
-    SDL_Delay(10);  // Add a small delay to control the frame rate
+	SDL_Delay(10);	// Add a small delay to control the frame rate
 }
-

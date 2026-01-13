@@ -9,6 +9,7 @@ enum ETraceType { TT_NONE, TT_POINT, TT_SPHERE, TT_BOX };
 
 class CTrace2D {
 	friend class Hull2D;
+	friend class Circle2D;
 	bool bStartSolid;
 	bool bAllSolid;
 	Vec2D start, end;

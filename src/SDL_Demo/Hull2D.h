@@ -5,7 +5,9 @@
 #include <PlaneSet2D.h>
 #include <Polygon2D.h>
 
-class Hull2D {
+#include "Shape2D.h"
+
+class Hull2D : public Shape2D {
 	BBox2D bb;
 	Polygon2D vertices;
 	PlaneSet2D planes;
@@ -15,16 +17,23 @@ public:
 	void fromPoly(const class Vec2D& a, const Vec2D& b, const Vec2D& c, const Vec2D& d,
 				  bool bSort = false);
 	void fromPoly(const Array<Vec2D>& poly, bool bSort = false);
-	bool trace(class CTrace2D& tr) const;
+	virtual bool trace(class CTrace2D& tr) const override;
 	bool hasPlane(const Plane2D& pl) const;
 	bool isInside(const class Vec2D& p) const;
 	bool intersectsSAT(const Hull2D& other) const;
+
+	// Shape2D interface
+	virtual bool intersects(const Shape2D* other) const override;
+	virtual void translate(const class Vec2D& p) override;
+	virtual void rotateCenterRadians(float angle) override;
+	virtual EShapeType getType() const override {
+		return ST_HULL;
+	}
+
 	void addAxisAlignedPlanesFromBounds();
 	void rebuildPolygonFromPlanes();
 	void rebuildPlanesFromPolygons();
-	void translate(const class Vec2D& p);
 	void rotateAroundRadians(const class Vec2D& center, float angle);
-	void rotateCenterRadians(float angle);
 
 	const Polygon2D& getPoly() const {
 		return vertices;
@@ -32,7 +41,7 @@ public:
 	const PlaneSet2D& getPlanes() const {
 		return planes;
 	}
-	const BBox2D& getBB() const {
+	virtual const BBox2D& getBB() const override {
 		return bb;
 	}
 };

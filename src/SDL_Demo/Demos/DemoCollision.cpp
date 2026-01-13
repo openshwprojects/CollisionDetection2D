@@ -26,6 +26,11 @@ void CDemoCollision::onDemoInit() {
 
 	// Angled box in the middle-bottom
 	hulls.addPoly(Vec2D(400, 300), Vec2D(500, 250), Vec2D(550, 350), Vec2D(450, 400), true);
+
+	// Sample Circle
+	hulls.addCircle(Vec2D(100, 100), 40.0f);
+	// Second Circle (Larger)
+	hulls.addCircle(Vec2D(400, 200), 60.0f);
 }
 
 void CDemoCollision::processMyEvent(int code) {
@@ -41,7 +46,7 @@ const char* CDemoCollision::getName() const {
 
 void CDemoCollision::onMouseMoveEvent(int x, int y, int dX, int dY) {
 	if (draggingIndex != -1) {
-		hulls[draggingIndex].translate(Vec2D(dX, dY));
+		hulls[draggingIndex]->translate(Vec2D(dX, dY));
 	}
 }
 void CDemoCollision::onMouseEvent(int x, int y, int button, bool bDown) {
@@ -56,7 +61,7 @@ void CDemoCollision::onMouseEvent(int x, int y, int button, bool bDown) {
 		if (bDown) {
 			int which = hulls.findByPoint(Vec2D(x, y));
 			if (which != -1) {
-				hulls[which].rotateCenterRadians(DEG2RAD(45.0f));
+				hulls[which]->rotateCenterRadians(DEG2RAD(45.0f));
 			}
 		}
 	}
@@ -76,23 +81,33 @@ void CDemoCollision::runFrame() {
 	container->drawDebugText("LMB: Drag, RMB: Rotate");
 
 	for (int i = 0; i < hulls.size(); i++) {
-		const Hull2D& h = hulls[i];
+		Shape2D* h = hulls[i];
 		bool bHasCollision = false;
 		for (int j = 0; j < hulls.size(); j++) {
-			const Hull2D& hi = hulls[j];
+			Shape2D* hi = hulls[j];
 			if (i == j) {
 				continue;
 			}
-			if (hi.getBB().intersectsBox(h.getBB())) {
-				if (h.intersectsSAT(hi)) {
+			if (hi->getBB().intersectsBox(h->getBB())) {
+				if (h->intersects(hi)) {
 					bHasCollision = true;
 				}
 			}
 		}
+
+		int rCol = 0;
+		int gCol = 250;
 		if (bHasCollision) {
-			this->drawPoly(h.getPoly(), 250, 0, 0);
-		} else {
-			this->drawPoly(h.getPoly(), 0, 250, 0);
+			rCol = 250;
+			gCol = 0;
+		}
+
+		if (h->getType() == ST_HULL) {
+			this->drawPoly(static_cast<Hull2D*>(h)->getPoly(), rCol, gCol, 0);
+		} else if (h->getType() == ST_CIRCLE) {
+			Circle2D* c = static_cast<Circle2D*>(h);
+			r->setColor(rCol, gCol, 0);
+			r->drawCircle(c->getCenter(), c->getRadius());
 		}
 	}
 

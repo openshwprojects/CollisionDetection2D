@@ -181,10 +181,7 @@
 				RelativePath=".\Hull2D.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\Hull2DList.cpp"
-				>
-			</File>
+
 			<File
 				RelativePath=".\main.cpp"
 				>
@@ -224,11 +221,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Circle2D.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hull2D.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Hull2DList.h"
+				RelativePath=".\ShapeList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Shape2D.h"
 				>
 			</File>
 			<File
