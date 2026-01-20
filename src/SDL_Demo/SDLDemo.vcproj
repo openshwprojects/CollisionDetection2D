@@ -269,6 +269,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Demos\DemoCSG.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Demos\DemoCSG.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Demos\DemoSortVertices.cpp"
 				>
 			</File>

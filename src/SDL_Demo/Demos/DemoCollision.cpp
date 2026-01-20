@@ -80,6 +80,8 @@ void CDemoCollision::runFrame() {
 	container->drawDebugText("Simple polygon collision.");
 	container->drawDebugText("LMB: Drag, RMB: Rotate");
 
+	std::vector<CCollision> collisions;
+
 	for (int i = 0; i < hulls.size(); i++) {
 		Shape2D* h = hulls[i];
 		bool bHasCollision = false;
@@ -89,8 +91,43 @@ void CDemoCollision::runFrame() {
 				continue;
 			}
 			if (hi->getBB().intersectsBox(h->getBB())) {
-				if (h->intersects(hi)) {
+				CCollision col;
+				if (h->intersects(hi, &col)) {
 					bHasCollision = true;
+					collisions.push_back(col);
+
+					// Draw Shadows (Moved out positions)
+					// Only draw once per pair to avoid duplicates
+					if (j > i) {
+						Vec2D sep = col.normal * col.distance;
+
+						// Shadow Color
+						byte sR = 0, sG = 255, sB = 255;  // Cyan
+
+						// Shadow A (this) - Moves AGAINST normal
+						Vec2D offA = sep * -0.5f;
+						if (h->getType() == ST_HULL) {
+							Polygon2D poly = static_cast<Hull2D*>(h)->getPoly();
+							poly.translate(offA);
+							this->drawPoly(poly, sR, sG, sB, 0);
+						} else if (h->getType() == ST_CIRCLE) {
+							Circle2D* c = static_cast<Circle2D*>(h);
+							r->setColor(sR, sG, sB);
+							r->drawCircle(c->getCenter() + offA, c->getRadius());
+						}
+
+						// Shadow B (other) - Moves ALONG normal
+						Vec2D offB = sep * 0.5f;
+						if (hi->getType() == ST_HULL) {
+							Polygon2D poly = static_cast<Hull2D*>(hi)->getPoly();
+							poly.translate(offB);
+							this->drawPoly(poly, sR, sG, sB, 0);
+						} else if (hi->getType() == ST_CIRCLE) {
+							Circle2D* c = static_cast<Circle2D*>(hi);
+							r->setColor(sR, sG, sB);
+							r->drawCircle(c->getCenter() + offB, c->getRadius());
+						}
+					}
 				}
 			}
 		}
@@ -103,11 +140,41 @@ void CDemoCollision::runFrame() {
 		}
 
 		if (h->getType() == ST_HULL) {
-			this->drawPoly(static_cast<Hull2D*>(h)->getPoly(), rCol, gCol, 0);
+			Hull2D* hull = static_cast<Hull2D*>(h);
+			this->drawPoly(hull->getPoly(), rCol, gCol, 0);
+			// Draw Normals
+			const PlaneSet2D& planes = hull->getPlanes();
+			r->setColor(255, 255, 0);  // Yellow normals
+			for (int k = 0; k < planes.size(); k++) {
+				const Plane2D& pl = planes[k];
+				Vec2D cent;
+				// Estimate center of edge?
+				// Requires vertices.
+				// But we can just use plane info.
+				// Or use polygon points.
+				const Polygon2D& poly = hull->getPoly();
+				if (k < poly.size()) {
+					Vec2D p1 = poly[k];
+					Vec2D p2 = poly[(k + 1) % poly.size()];
+					cent = (p1 + p2) * 0.5f;
+					r->drawLine(cent, cent + pl.getNormal() * 10.0f);
+				}
+			}
 		} else if (h->getType() == ST_CIRCLE) {
 			Circle2D* c = static_cast<Circle2D*>(h);
 			r->setColor(rCol, gCol, 0);
 			r->drawCircle(c->getCenter(), c->getRadius());
+		}
+	}
+
+	// Draw collisions
+	for (size_t i = 0; i < collisions.size(); i++) {
+		const CCollision& col = collisions[i];
+		r->setColor(255, 0, 255);  // Purple for contact info
+		for (int p = 0; p < col.numPoints; p++) {
+			r->drawCircle(col.points[p], 3.0f);
+			r->drawLine(col.points[p],
+						col.points[p] + col.normal * col.distance * 10.0f);	 // Scale up normal
 		}
 	}
 

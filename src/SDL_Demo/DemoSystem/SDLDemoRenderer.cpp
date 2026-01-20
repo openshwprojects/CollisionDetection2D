@@ -83,14 +83,36 @@ void SDLDemoRenderer::drawLine(const Vec2D& a, const Vec2D& b, int width) {
 	}
 }
 void SDLDemoRenderer::fillPoly(const class Polygon2D& p) {
-	SDL_Point* pts = (SDL_Point*)alloca(p.size() * sizeof(SDL_Point));
+	if (p.size() < 3) return;
+
+	// specific valid triangulation for CONVEX polygons (fan)
+	int num_vertices = p.size();
+	int num_indices = (p.size() - 2) * 3;
+
+	SDL_Vertex* verts = (SDL_Vertex*)alloca(num_vertices * sizeof(SDL_Vertex));
+	int* indices = (int*)alloca(num_indices * sizeof(int));
+
+	byte r, g, b, a;
+	SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+	SDL_Color col = {r, g, b, a};
+
 	for (int i = 0; i < p.size(); i++) {
-		SDL_Point& tg = pts[i];
 		const Vec2D& s = p[i];
-		tg.x = s.getX();
-		tg.y = s.getY();
+		verts[i].position.x = s.getX();
+		verts[i].position.y = s.getY();
+		verts[i].color = col;
+		verts[i].tex_coord.x = 0;
+		verts[i].tex_coord.y = 0;
 	}
-	// TODO - fill poly
+
+	int idx = 0;
+	for (int i = 0; i < p.size() - 2; i++) {
+		indices[idx++] = 0;
+		indices[idx++] = i + 1;
+		indices[idx++] = i + 2;
+	}
+
+	SDL_RenderGeometry(renderer, NULL, verts, num_vertices, indices, num_indices);
 }
 void SDLDemoRenderer::drawBox(const class BBox2D& box) {
 	for (int i = 0; i < 4; i++) {

@@ -20,10 +20,10 @@ public:
 	virtual bool trace(class CTrace2D& tr) const override;
 	bool hasPlane(const Plane2D& pl) const;
 	bool isInside(const class Vec2D& p) const;
-	bool intersectsSAT(const Hull2D& other) const;
+	bool intersectsSAT(const Hull2D& other, CCollision* col) const;
 
 	// Shape2D interface
-	virtual bool intersects(const Shape2D* other) const override;
+	virtual bool intersects(const Shape2D* other, CCollision* col = NULL) const override;
 	virtual void translate(const class Vec2D& p) override;
 	virtual void rotateCenterRadians(float angle) override;
 	virtual EShapeType getType() const override {
