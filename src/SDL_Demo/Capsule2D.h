@@ -57,43 +57,43 @@ class Capsule2D : public Shape2D {
 			// Segments are parallel
 			sN = 0.0f;
 			sD = 1.0f;
-			tN = d5;
+			tN = -d5;
 			tD = d3;
 		} else {
-			sN = d2 * d5 - d3 * d4;
-			tN = d1 * d5 - d2 * d4;
+			sN = d3 * d4 - d2 * d5;
+			tN = d2 * d4 - d1 * d5;
 		}
 
 		// Clamp s
 		if (sN < 0.0f) {
 			sN = 0.0f;
-			tN = d5;
+			tN = -d5;
 			tD = d3;
 		} else if (sN > sD) {
 			sN = sD;
-			tN = d5 + d2;
+			tN = -d5 + d2;
 			tD = d3;
 		}
 
 		// Clamp t
 		if (tN < 0.0f) {
 			tN = 0.0f;
-			if (-d4 < 0.0f)
+			if (d4 < 0.0f)
 				sN = 0.0f;
-			else if (-d4 > d1)
+			else if (d4 > d1)
 				sN = sD;
 			else {
-				sN = -d4;
+				sN = d4;
 				sD = d1;
 			}
 		} else if (tN > tD) {
 			tN = tD;
-			if ((-d4 + d2) < 0.0f)
+			if ((d4 + d2) < 0.0f)
 				sN = 0.0f;
-			else if ((-d4 + d2) > d1)
+			else if ((d4 + d2) > d1)
 				sN = sD;
 			else {
-				sN = -d4 + d2;
+				sN = d4 + d2;
 				sD = d1;
 			}
 		}
