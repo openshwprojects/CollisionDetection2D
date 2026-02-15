@@ -181,7 +181,6 @@
 				RelativePath=".\Hull2D.cpp"
 				>
 			</File>
-
 			<File
 				RelativePath=".\main.cpp"
 				>
@@ -196,6 +195,10 @@
 			</File>
 			<File
 				RelativePath=".\SelfTests.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ShapeList.cpp"
 				>
 			</File>
 			<File
@@ -217,7 +220,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common.h"
+				RelativePath=".\Capsule2D.h"
 				>
 			</File>
 			<File
@@ -225,15 +228,11 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Common.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hull2D.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ShapeList.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Shape2D.h"
 				>
 			</File>
 			<File
@@ -250,6 +249,14 @@
 			</File>
 			<File
 				RelativePath=".\Polygon2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Shape2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ShapeList.h"
 				>
 			</File>
 			<File

@@ -37,6 +37,9 @@ void CDemoTrace::onDemoInit() {
 	hulls.addCircle(Vec2D(100, 450), 40.0f);
 	// Second Circle (Larger)
 	hulls.addCircle(Vec2D(300, 450), 60.0f);
+
+	// Sample Capsule
+	hulls.addCapsule(Vec2D(500, 400), Vec2D(700, 500), 30.0f);
 }
 
 void CDemoTrace::processMyEvent(int code) {
@@ -85,6 +88,30 @@ void CDemoTrace::runFrame() {
 			Circle2D* c = static_cast<Circle2D*>(s);
 			r->setColor(100, 0, 0);
 			r->drawCircle(c->getCenter(), c->getRadius());
+		} else if (s->getType() == ST_CAPSULE) {
+			Capsule2D* cap = static_cast<Capsule2D*>(s);
+			r->setColor(100, 0, 0);
+			Vec2D a = cap->getPointA();
+			Vec2D b = cap->getPointB();
+			Vec2D dir = b - a;
+			dir.normalize();
+			Vec2D perp = dir.getPerpendicular() * cap->getRadius();
+			r->drawLine(a + perp, b + perp);
+			r->drawLine(a - perp, b - perp);
+			float baseAngle = dir.getAngleDeg();
+			float step = 5.0f;
+			for (float ang = 90; ang < 270; ang += step) {
+				Vec2D da, db;
+				da.fromDegs(baseAngle + ang, cap->getRadius());
+				db.fromDegs(baseAngle + ang + step, cap->getRadius());
+				r->drawLine(a + da, a + db);
+			}
+			for (float ang = -90; ang < 90; ang += step) {
+				Vec2D da, db;
+				da.fromDegs(baseAngle + ang, cap->getRadius());
+				db.fromDegs(baseAngle + ang + step, cap->getRadius());
+				r->drawLine(b + da, b + db);
+			}
 		}
 	}
 	if (curType == TT_POINT) {

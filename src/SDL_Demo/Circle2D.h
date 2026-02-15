@@ -33,7 +33,7 @@ public:
 
 		float r = radius + tr.getRadius();	// Combine radii
 		Vec2D f = tr.getStart() - center;
-		Vec2D d = tr.getDir();	// This is delta
+		Vec2D d = tr.getEnd() - tr.getStart();	// Full delta, not normalized dir
 
 		float a = d.dot(d);
 		float b = 2 * f.dot(d);
@@ -186,7 +186,14 @@ public:
 					return true;
 				}
 			}
+		} else if (other->getType() == ST_CAPSULE) {
+			bool hit = other->intersects(this, col);
+			if (hit && col) {
+				col->normal = col->normal * -1.0f;
+			}
+			return hit;
 		}
+		return false;
 	}
 
 	virtual void translate(const Vec2D& p) override {

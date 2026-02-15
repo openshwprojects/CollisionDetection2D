@@ -31,6 +31,10 @@ void CDemoCollision::onDemoInit() {
 	hulls.addCircle(Vec2D(100, 100), 40.0f);
 	// Second Circle (Larger)
 	hulls.addCircle(Vec2D(400, 200), 60.0f);
+
+	// Sample Capsules
+	hulls.addCapsule(Vec2D(350, 450), Vec2D(550, 450), 25.0f);
+	hulls.addCapsule(Vec2D(100, 400), Vec2D(100, 500), 20.0f);
 }
 
 void CDemoCollision::processMyEvent(int code) {
@@ -114,6 +118,30 @@ void CDemoCollision::runFrame() {
 							Circle2D* c = static_cast<Circle2D*>(h);
 							r->setColor(sR, sG, sB);
 							r->drawCircle(c->getCenter() + offA, c->getRadius());
+						} else if (h->getType() == ST_CAPSULE) {
+							Capsule2D* cap = static_cast<Capsule2D*>(h);
+							r->setColor(sR, sG, sB);
+							Vec2D ga = cap->getPointA() + offA;
+							Vec2D gb = cap->getPointB() + offA;
+							Vec2D gdir = gb - ga;
+							gdir.normalize();
+							Vec2D gperp = gdir.getPerpendicular() * cap->getRadius();
+							r->drawLine(ga + gperp, gb + gperp);
+							r->drawLine(ga - gperp, gb - gperp);
+							float gBaseAngle = gdir.getAngleDeg();
+							float gstep = 10.0f;
+							for (float ang = 90; ang < 270; ang += gstep) {
+								Vec2D da, db;
+								da.fromDegs(gBaseAngle + ang, cap->getRadius());
+								db.fromDegs(gBaseAngle + ang + gstep, cap->getRadius());
+								r->drawLine(ga + da, ga + db);
+							}
+							for (float ang = -90; ang < 90; ang += gstep) {
+								Vec2D da, db;
+								da.fromDegs(gBaseAngle + ang, cap->getRadius());
+								db.fromDegs(gBaseAngle + ang + gstep, cap->getRadius());
+								r->drawLine(gb + da, gb + db);
+							}
 						}
 
 						// Shadow B (other) - Moves ALONG normal
@@ -126,6 +154,30 @@ void CDemoCollision::runFrame() {
 							Circle2D* c = static_cast<Circle2D*>(hi);
 							r->setColor(sR, sG, sB);
 							r->drawCircle(c->getCenter() + offB, c->getRadius());
+						} else if (hi->getType() == ST_CAPSULE) {
+							Capsule2D* cap = static_cast<Capsule2D*>(hi);
+							r->setColor(sR, sG, sB);
+							Vec2D ga = cap->getPointA() + offB;
+							Vec2D gb = cap->getPointB() + offB;
+							Vec2D gdir = gb - ga;
+							gdir.normalize();
+							Vec2D gperp = gdir.getPerpendicular() * cap->getRadius();
+							r->drawLine(ga + gperp, gb + gperp);
+							r->drawLine(ga - gperp, gb - gperp);
+							float gBaseAngle = gdir.getAngleDeg();
+							float gstep = 10.0f;
+							for (float ang = 90; ang < 270; ang += gstep) {
+								Vec2D da, db;
+								da.fromDegs(gBaseAngle + ang, cap->getRadius());
+								db.fromDegs(gBaseAngle + ang + gstep, cap->getRadius());
+								r->drawLine(ga + da, ga + db);
+							}
+							for (float ang = -90; ang < 90; ang += gstep) {
+								Vec2D da, db;
+								da.fromDegs(gBaseAngle + ang, cap->getRadius());
+								db.fromDegs(gBaseAngle + ang + gstep, cap->getRadius());
+								r->drawLine(gb + da, gb + db);
+							}
 						}
 					}
 				}
@@ -164,6 +216,32 @@ void CDemoCollision::runFrame() {
 			Circle2D* c = static_cast<Circle2D*>(h);
 			r->setColor(rCol, gCol, 0);
 			r->drawCircle(c->getCenter(), c->getRadius());
+		} else if (h->getType() == ST_CAPSULE) {
+			Capsule2D* cap = static_cast<Capsule2D*>(h);
+			r->setColor(rCol, gCol, 0);
+			// Draw capsule: two semicircles at endpoints + two connecting lines
+			Vec2D a = cap->getPointA();
+			Vec2D b = cap->getPointB();
+			Vec2D dir = b - a;
+			dir.normalize();
+			Vec2D perp = dir.getPerpendicular() * cap->getRadius();
+			r->drawLine(a + perp, b + perp);
+			r->drawLine(a - perp, b - perp);
+			// Semicircles at each end
+			float baseAngle = dir.getAngleDeg();
+			float step = 5.0f;
+			for (float ang = 90; ang < 270; ang += step) {
+				Vec2D da, db;
+				da.fromDegs(baseAngle + ang, cap->getRadius());
+				db.fromDegs(baseAngle + ang + step, cap->getRadius());
+				r->drawLine(a + da, a + db);
+			}
+			for (float ang = -90; ang < 90; ang += step) {
+				Vec2D da, db;
+				da.fromDegs(baseAngle + ang, cap->getRadius());
+				db.fromDegs(baseAngle + ang + step, cap->getRadius());
+				r->drawLine(b + da, b + db);
+			}
 		}
 	}
 

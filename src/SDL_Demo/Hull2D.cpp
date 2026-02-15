@@ -243,6 +243,12 @@ bool Hull2D::intersects(const Shape2D* other, CCollision* col) const {
 			col->normal = col->normal * -1.0f;
 		}
 		return hit;
+	} else if (other->getType() == ST_CAPSULE) {
+		bool hit = other->intersects(this, col);
+		if (hit && col) {
+			col->normal = col->normal * -1.0f;
+		}
+		return hit;
 	}
 	return false;
 }

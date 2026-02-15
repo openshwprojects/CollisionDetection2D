@@ -11,7 +11,7 @@ struct CCollision {
 	int numPoints;
 };
 
-enum EShapeType { ST_HULL, ST_CIRCLE };
+enum EShapeType { ST_HULL, ST_CIRCLE, ST_CAPSULE };
 
 class Shape2D {
 public:

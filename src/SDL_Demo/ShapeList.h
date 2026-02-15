@@ -1,11 +1,11 @@
 #ifndef __SHAPELIST_H__
 #define __SHAPELIST_H__
 
+#include "Capsule2D.h"
 #include "Circle2D.h"
 #include "Common.h"
 #include "Hull2D.h"
 #include "Shape2D.h"
-
 
 // Replaces Hull2DList
 class ShapeList {
@@ -58,6 +58,12 @@ public:
 		return *c;
 	}
 
+	Capsule2D& addCapsule(const Vec2D& a, const Vec2D& b, float radius) {
+		Capsule2D* c = new Capsule2D(a, b, radius);
+		addShape(c);
+		return *c;
+	}
+
 	const Shape2D* operator[](int i) const {
 		return shapes[i];
 	}
@@ -97,11 +103,29 @@ public:
 				} else if (shapes[i]->getType() == ST_CIRCLE) {
 					const Circle2D* c = static_cast<Circle2D*>(shapes[i]);
 					if (c->getCenter().distanceToSq(p) <= c->getRadius() * c->getRadius()) return i;
+				} else if (shapes[i]->getType() == ST_CAPSULE) {
+					const Capsule2D* cap = static_cast<Capsule2D*>(shapes[i]);
+					Vec2D ab = cap->getPointB() - cap->getPointA();
+					float lenSq = ab.lengthSq();
+					float t = 0.0f;
+					if (lenSq > 0.0001f) {
+						t = (p - cap->getPointA()).dot(ab) / lenSq;
+					}
+					if (t < 0)
+						t = 0;
+					else if (t > 1)
+						t = 1;
+					Vec2D closest = cap->getPointA() + ab * t;
+					if (closest.distanceToSq(p) <= cap->getRadius() * cap->getRadius()) return i;
 				}
 			}
 		}
 		return -1;
 	}
+
+	// Perform CSG subtraction in place
+	// Subtracts the cutter shape from all shapes in this list
+	void subtract(Shape2D* cutter);
 };
 
 #endif	// __SHAPELIST_H__
