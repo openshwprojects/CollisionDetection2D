@@ -3,19 +3,21 @@
 #include <DemoSystem/IDemoRenderer.h>
 #include <DemoSystem/SDLDemoRenderer.h>
 
+#include "TestSystem.h"
+
+
 void doBasicSelfTests();
 
 int main() {
-
+	TestSystem_RunAll();
 	doBasicSelfTests();
 
-
-	CDemoContainer *demo = new CDemoContainer();
-	SDLDemoRenderer *ren = new SDLDemoRenderer();
+	CDemoContainer* demo = new CDemoContainer();
+	SDLDemoRenderer* ren = new SDLDemoRenderer();
 	demo->setRenderer(ren);
 	ren->createWindow();
 	ren->setDemo(demo);
-	while(!ren->processEvents()) {
+	while (!ren->processEvents()) {
 		demo->runFrame();
 	}
 	ren->shutdown();
